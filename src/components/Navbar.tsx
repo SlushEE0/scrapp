@@ -14,10 +14,11 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavbar } from "@/hooks/useNavbar";
 import type { PBUser_t } from "../lib/types";
 import { logout } from "@/lib/auth";
-import { recordToImageUrl } from "@/lib/pocketbase";
+import { recordToImageUrl } from "@/lib/pbaseClient";
 
-const navItems = [
+let navItems = [
   {
+    onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
     label: "Home",
     url: "/home",
@@ -36,6 +37,7 @@ const navItems = [
     msg: "Going to Outreach"
   },
   {
+    onlyHomePersist: true,
     icon: <Signature className="h-5 w-5" />,
     label: "Sign Out",
     url: "/",
@@ -57,11 +59,15 @@ export default function Navbar({}) {
   const isMobile = useIsMobile();
   const { user, setUser } = useUser();
 
-  const { forcedDisable, setForcedDisable } = useNavbar();
+  const { forcedDisable, setForcedDisable, renderOnlyHome } = useNavbar();
 
   const router = useRouter();
 
   type NavigateParams = { url: string; msg?: string; func?: () => boolean };
+
+  if (renderOnlyHome) {
+    navItems = navItems.filter((item) => item.onlyHomePersist);
+  }
 
   const onNavigate = function ({
     url,
@@ -73,6 +79,7 @@ export default function Navbar({}) {
     if (func()) router.push(url);
   };
 
+  // Forced disable is disabled by default
   useEffect(() => {
     setForcedDisable(false);
   }, []);

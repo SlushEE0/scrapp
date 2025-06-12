@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { pb } from "./pocketbase";
+import { pb } from "./pbaseClient";
 import { PBUser_t } from "./types";
 import { BaseStates } from "./states";
-import { getPocketbaseCookie, setPocketbaseCookie } from "./pbServer";
+import { getPocketbaseCookie, setPocketbaseCookie } from "./pbaseServer";
 
 export async function loginEmailPass(
   email: string,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import PocketBase from "pocketbase";
 
-import { getPocketbaseCookie } from "./lib/pbServer";
+import { getPocketbaseCookie } from "./lib/pbaseServer";
 
 const adminPaths = ["/admin", "/testing"];
 const authorizedPaths = ["/", "/profile"];
