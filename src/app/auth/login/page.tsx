@@ -24,7 +24,7 @@ import {
 import { BaseStates } from "@/lib/states";
 
 export default function LoginForm() {
-  const { setForcedDisable } = useNavbar();
+  const { setRenderOnlyHome } = useNavbar();
 
   const router = useRouter();
 
@@ -34,7 +34,7 @@ export default function LoginForm() {
   });
 
   useEffect(() => {
-    setForcedDisable(true);
+    setRenderOnlyHome(true);
 
     window.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
@@ -43,14 +43,14 @@ export default function LoginForm() {
     });
 
     return () => {
-      setForcedDisable(false);
+      setRenderOnlyHome(false);
     };
   }, []);
 
   const redirectToHome = function () {
     console.log("Redirecting ...");
 
-    router.push("/");
+    setTimeout(router.push.bind(null, "/"), 300);
   };
 
   const handleGoogleOAuth = async function () {

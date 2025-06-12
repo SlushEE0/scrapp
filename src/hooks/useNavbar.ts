@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 // Global state store
 let navbarState = {
-  forcedDisable: true
+  forcedDisable: true,
+  renderOnlyHome: false
 };
 
 const listeners = new Set<() => void>();
@@ -32,8 +33,15 @@ export function useNavbar() {
     emitChange();
   };
 
+  const setRenderOnlyHome = (value: boolean) => {
+    navbarState = { ...navbarState, renderOnlyHome: value };
+    emitChange();
+  };
+
   return {
     forcedDisable: state.forcedDisable,
-    setForcedDisable
+    setForcedDisable,
+    renderOnlyHome: state.renderOnlyHome,
+    setRenderOnlyHome
   } as const;
 }
