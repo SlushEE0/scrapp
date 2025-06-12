@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -17,20 +17,24 @@ import { Label } from "@/components/ui/label";
 
 import { useNavbar } from "@/hooks/useNavbar";
 import {
+  createUser,
   loginEmailPass,
   loginOAuth_Discord,
   loginOAuth_Google
 } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const { setForcedDisable } = useNavbar();
 
   const router = useRouter();
 
-  const [loginData, setLoginData] = useState({
+  const [userData, setUserData] = useState({
+    name: "",
     email: "",
-    password: ""
+    password1: "",
+    password2: ""
   });
 
   useEffect(() => {
@@ -47,93 +51,86 @@ export default function LoginForm() {
     };
   }, []);
 
-  const redirectToHome = function () {
-    console.log("Redirecting ...");
-
-    router.push("/");
+  const handleGoogleOAuth = function () {
+    loginOAuth_Google();
   };
 
-  const handleGoogleOAuth = async function () {
-    const loader = toast.loading("Continue on the popup ...");
-
-    const state = await loginOAuth_Google();
-
-    toast.dismiss(loader);
-
-    switch (state) {
-      case BaseStates.SUCCESS:
-        toast.success("Login successful!");
-        redirectToHome();
-        break;
-      case BaseStates.ERROR:
-      default:
-        toast.error("Something went wrong :(");
-        break;
-    }
-  };
-
-  const handleDiscordOAuth = async function () {
-    const loader = toast.loading("Continue on the popup ...");
-
-    const state = await loginOAuth_Discord();
-
-    toast.dismiss(loader);
-
-    switch (state) {
-      case BaseStates.SUCCESS:
-        toast.success("Login successful!");
-        redirectToHome();
-        break;
-      case BaseStates.ERROR:
-      default:
-        toast.error("Something went wrong :(");
-        break;
-    }
+  const handleDiscordOAuth = function () {
+    loginOAuth_Discord();
   };
 
   const handleSubmit = async function () {
-    let { email, password } = loginData;
+    let { name, email, password1, password2 } = userData;
 
-    console.log("Form submitted with:", { email, password });
+    console.log("Form submitted with:", { name, email, password1, password2 });
 
-    if (!email || !password) {
-      toast.error("Email and password are required.");
+    if (!email || !password1 || !password2 || !name) {
+      toast.error("Please fill in all fields.");
       return;
     }
 
+    name = name.trim();
     email = email.trim();
 
-    setLoginData({
-      email,
-      password
-    });
+    setUserData((d) => ({
+      ...d,
+      name,
+      email
+    }));
+
+    const validateName = (name: string) => {
+      const re = /[A-Za-z0-9]+$/;
+      return re.test(String(name).toLowerCase());
+    };
 
     const validateEmail = (email: string) => {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(String(email).toLowerCase());
     };
 
+    if (!name) {
+      toast.error("Please enter a display name.");
+    }
+
+    if (name.length < 3) {
+      toast.error("Display name must be at least 3 characters long.");
+    }
+
+    if (!validateName(name)) {
+      toast.error("Display name can only contain letters and numbers.");
+      return;
+    }
+
     if (!validateEmail(email)) {
       toast.error("Please enter a valid email address.");
       return;
     }
 
-    if (password.length < 8) {
+    if (password1 !== password2) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    if (password1.length < 8) {
       toast.error("Password must be at least 8 characters long.");
       return;
     }
 
     toast.dismiss();
-    const loader = toast.loading("Creating Account ...");
+    const loader = toast.loading("Logging in...");
 
-    const state = await loginEmailPass(email, password);
+    const state1 = await createUser(email, password1, name);
+    const state2 =
+      state1 === BaseStates.SUCCESS
+        ? await loginEmailPass(email, password1)
+        : state1;
 
     toast.dismiss(loader);
 
-    switch (state) {
+    switch (state2) {
       case BaseStates.SUCCESS:
         toast.success("Login successful!");
-        redirectToHome();
+        router.push("/");
         break;
       case BaseStates.ERROR:
       default:
@@ -149,7 +146,7 @@ export default function LoginForm() {
           <Card className="bg-card/80 backdrop-blur-xl border border-border shadow-2xl">
             <CardHeader className="text-center">
               <CardTitle className="text-xl text-foreground">
-                Welcome back
+                Create an Account
               </CardTitle>
               <CardDescription className="text-muted-foreground">
                 Use your Google or Discord account
@@ -188,6 +185,26 @@ export default function LoginForm() {
                 </div>
                 <div className="grid gap-6">
                   <div className="grid gap-3">
+                    <div className="flex items-center">
+                      <Label htmlFor="name" className="text-foreground">
+                        Display Name
+                      </Label>
+                    </div>
+                    <Input
+                      name="name"
+                      type="text"
+                      className="bg-input border-border text-foreground"
+                      onChange={(e) => {
+                        setUserData((d) => ({
+                          ...d,
+                          name: e.target.value
+                        }));
+                      }}
+                      value={userData.name}
+                      autoCorrect="off"
+                    />
+                  </div>
+                  <div className="grid gap-3">
                     <Label htmlFor="email" className="text-foreground">
                       Email
                     </Label>
@@ -197,37 +214,53 @@ export default function LoginForm() {
                       placeholder="m@example.com"
                       className="bg-input border-border text-foreground placeholder:text-muted-foreground"
                       onChange={(e) => {
-                        setLoginData((d) => ({
+                        setUserData((d) => ({
                           ...d,
                           email: e.target.value
                         }));
                       }}
-                      value={loginData.email}
+                      value={userData.email}
                       autoComplete="email"
                     />
                   </div>
                   <div className="grid gap-3">
                     <div className="flex items-center">
-                      <Label htmlFor="password" className="text-foreground">
+                      <Label htmlFor="password1" className="text-foreground">
                         Password
                       </Label>
-                      <a
-                        href="/auth/forgot"
-                        className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground hover:text-foreground">
-                        Forgot your password?
-                      </a>
                     </div>
                     <Input
-                      name="password"
+                      name="password1"
                       type="password"
                       className="bg-input border-border text-foreground"
                       onChange={(e) => {
-                        setLoginData((d) => ({
+                        setUserData((d) => ({
                           ...d,
-                          password: e.target.value
+                          password1: e.target.value
                         }));
                       }}
-                      value={loginData.password}
+                      value={userData.password1}
+                      autoComplete="current-password"
+                      autoCorrect="off"
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <div className="flex items-center">
+                      <Label htmlFor="password1" className="text-foreground">
+                        Confirm Password
+                      </Label>
+                    </div>
+                    <Input
+                      name="password1"
+                      type="password"
+                      className="bg-input border-border text-foreground"
+                      onChange={(e) => {
+                        setUserData((d) => ({
+                          ...d,
+                          password2: e.target.value
+                        }));
+                      }}
+                      value={userData.password2}
                       autoComplete="current-password"
                       autoCorrect="off"
                     />
@@ -236,15 +269,15 @@ export default function LoginForm() {
                     type="submit"
                     className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={handleSubmit}>
-                    Login
+                    Sign Up
                   </Button>
                 </div>
                 <div className="text-center text-sm text-muted-foreground">
-                  Don&apos;t have an account?{" "}
+                  Already have an account?{" "}
                   <a
-                    href="/auth/signup"
+                    href="/auth/login"
                     className="underline underline-offset-4 text-foreground hover:text-primary">
-                    Sign Up
+                    Log In
                   </a>
                 </div>
               </div>
