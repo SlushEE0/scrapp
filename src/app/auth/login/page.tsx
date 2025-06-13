@@ -22,6 +22,7 @@ import {
   loginOAuth_Google
 } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
+import PasswordBlock from "../PasswordBlock";
 
 export default function LoginForm() {
   const { setRenderOnlyHome } = useNavbar();
@@ -219,11 +220,11 @@ export default function LoginForm() {
                         Forgot your password?
                       </a>
                     </div>
-                    <Input
+                    <PasswordBlock
                       name="password"
                       type="password"
                       className="bg-input border-border text-foreground"
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         setLoginData((d) => ({
                           ...d,
                           password: e.target.value

@@ -24,6 +24,7 @@ import {
 } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
 import { useRouter } from "next/navigation";
+import PasswordBlock from "../PasswordBlock";
 
 export default function LoginForm() {
   const { setForcedDisable } = useNavbar();
@@ -229,11 +230,11 @@ export default function LoginForm() {
                         Password
                       </Label>
                     </div>
-                    <Input
+                    <PasswordBlock
                       name="password1"
                       type="password"
                       className="bg-input border-border text-foreground"
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         setUserData((d) => ({
                           ...d,
                           password1: e.target.value
@@ -250,11 +251,11 @@ export default function LoginForm() {
                         Confirm Password
                       </Label>
                     </div>
-                    <Input
+                    <PasswordBlock
                       name="password1"
                       type="password"
                       className="bg-input border-border text-foreground"
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         setUserData((d) => ({
                           ...d,
                           password2: e.target.value

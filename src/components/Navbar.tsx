@@ -61,13 +61,13 @@ export default function Navbar({}) {
   const isMobile = useIsMobile();
   const { user, setUser } = useUser();
 
-  const { forcedDisable, renderOnlyHome } = useNavbar();
+  const state = useNavbar();
 
   const router = useRouter();
 
   type NavigateParams = { url: string; msg?: string; func?: () => boolean };
 
-  navItems = renderOnlyHome
+  navItems = state.renderOnlyHome
     ? navItems.filter((item) => item.onlyHomePersist)
     : allItems;
 
@@ -81,12 +81,12 @@ export default function Navbar({}) {
     if (func()) router.push(url);
   };
 
-  if (forcedDisable) return;
+  if (state.forcedDisable) return;
 
   return isMobile ? (
-    <Mobile {...{ user, onNavigate }} />
+    <Mobile {...state} {...{ user, onNavigate }} />
   ) : (
-    <Desktop {...{ user, onNavigate }} />
+    <Desktop {...state} {...{ user, onNavigate }} />
   );
 }
 
@@ -94,6 +94,7 @@ type Props = {
   user: PBUser_t | null;
   onNavigate: (url: { url: string; msg?: string }) => void;
   forcedDisable?: boolean;
+  defaultToShown: boolean;
 };
 
 function Mobile({ user, onNavigate, forcedDisable }: Props) {
@@ -162,7 +163,7 @@ function Mobile({ user, onNavigate, forcedDisable }: Props) {
   );
 }
 
-function Desktop({ user, onNavigate, forcedDisable }: Props) {
+function Desktop({ user, onNavigate, defaultToShown }: Props) {
   const [isVisible, setIsVisible] = useState(true);
   const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -170,7 +171,7 @@ function Desktop({ user, onNavigate, forcedDisable }: Props) {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > 100) {
+      if (currentScrollY >= 100) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
@@ -192,21 +193,25 @@ function Desktop({ user, onNavigate, forcedDisable }: Props) {
         e.clientX < rect.right
       ) {
         setIsVisible(true);
-      } else if (currentScrollY >= 100) {
+      } else if (currentScrollY >= 100 || !defaultToShown) {
         setIsVisible(false);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("mousemove", handleMouseMove);
+    defaultToShown ? window.addEventListener("scroll", handleScroll) : null;
+    defaultToShown ? handleScroll() : null; // Initial check on mount
 
-    handleScroll(); // Initial check on mount
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [defaultToShown, navbarRef, setIsVisible]);
+
+  useEffect(() => {
+    setIsVisible(defaultToShown);
+  }, [defaultToShown]);
 
   return (
     <div
