@@ -1,5 +1,3 @@
-import { useIsMobile } from "../hooks/use-mobile";
-
 export default function Home() {
   return (
     <main className="pt-20">

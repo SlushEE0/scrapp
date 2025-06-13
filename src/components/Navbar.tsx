@@ -16,7 +16,7 @@ import type { PBUser_t } from "../lib/types";
 import { logout } from "@/lib/auth";
 import { recordToImageUrl } from "@/lib/pbaseClient";
 
-let navItems = [
+const allItems = [
   {
     onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
@@ -55,19 +55,21 @@ let navItems = [
   // }
 ];
 
+let navItems = allItems;
+
 export default function Navbar({}) {
   const isMobile = useIsMobile();
   const { user, setUser } = useUser();
 
-  const { forcedDisable, setForcedDisable, renderOnlyHome } = useNavbar();
+  const { forcedDisable, renderOnlyHome } = useNavbar();
 
   const router = useRouter();
 
   type NavigateParams = { url: string; msg?: string; func?: () => boolean };
 
-  if (renderOnlyHome) {
-    navItems = navItems.filter((item) => item.onlyHomePersist);
-  }
+  navItems = renderOnlyHome
+    ? navItems.filter((item) => item.onlyHomePersist)
+    : allItems;
 
   const onNavigate = function ({
     url,
@@ -78,11 +80,6 @@ export default function Navbar({}) {
 
     if (func()) router.push(url);
   };
-
-  // Forced disable is disabled by default
-  useEffect(() => {
-    setForcedDisable(false);
-  }, []);
 
   if (forcedDisable) return;
 
@@ -102,20 +99,24 @@ type Props = {
 function Mobile({ user, onNavigate, forcedDisable }: Props) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border rounded-t-2xl shadow-2xl">
-      <div className="flex items-center justify-around px-3 py-2">
+      <div className="flex items-center justify-around px-3 py-2 transition-all duration-300 ease-in-out">
         {navItems.map((item, index) => (
           <Button
             key={index}
             variant="ghost"
             size="sm"
-            className="flex flex-col items-center space-y-1 text-muted-foreground hover:text-foreground h-auto py-1.5 px-2"
+            className="flex flex-col items-center space-y-1 text-muted-foreground hover:text-foreground h-auto py-1.5 px-2 transition-all duration-300 ease-in-out opacity-100"
             onClick={onNavigate.bind(null, {
               url: item.url,
               msg: item?.msg,
               func: item?.func
             })}>
-            <div className="flex items-center justify-center">{item.icon}</div>
-            <span className="text-xs font-medium">{item.label}</span>
+            <div className="flex items-center justify-center transition-all duration-300 ease-in-out">
+              {item.icon}
+            </div>
+            <span className="text-xs font-medium transition-all duration-300 ease-in-out">
+              {item.label}
+            </span>
           </Button>
         ))}
         {user ? (
@@ -213,22 +214,26 @@ function Desktop({ user, onNavigate, forcedDisable }: Props) {
       className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}>
-      <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl px-6 py-3">
-        <div className="flex items-center justify-between space-x-8">
-          <nav className="flex items-center space-x-2">
+      <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl px-6 py-3 transition-all duration-300 ease-in-out">
+        <div className="flex items-center justify-between space-x-8 transition-all duration-300 ease-in-out">
+          <nav className="flex items-center space-x-2 transition-all duration-300 ease-in-out">
             {navItems.map((item, index) => (
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground"
+                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100"
                 key={index}
                 onClick={onNavigate.bind(null, {
                   url: item.url,
                   msg: item?.msg,
                   func: item?.func
                 })}>
-                <div className="size-4">{item.icon}</div>
-                <span className="text-sm font-medium">{item.label}</span>
+                <div className="size-4 transition-all duration-300 ease-in-out">
+                  {item.icon}
+                </div>
+                <span className="text-sm font-medium transition-all duration-300 ease-in-out">
+                  {item.label}
+                </span>
               </Button>
             ))}
           </nav>

@@ -50,7 +50,9 @@ export default function LoginForm() {
   const redirectToHome = function () {
     console.log("Redirecting ...");
 
-    setTimeout(router.push.bind(null, "/"), 300);
+    setTimeout(() => {
+      router.push("/");
+    }, 500);
   };
 
   const handleGoogleOAuth = async function () {

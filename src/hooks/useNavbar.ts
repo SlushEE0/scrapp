@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 
 // Global state store
 let navbarState = {
-  forcedDisable: true,
+  forcedDisable: false,
   renderOnlyHome: false
 };
 

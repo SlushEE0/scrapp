@@ -11,4 +11,5 @@ export interface PBUser_t extends RecordModel {
   name: string;
   updated: string;
   verified: boolean;
+  role: "member" | "admin" | "guest";
 }
