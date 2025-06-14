@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavbar } from "@/hooks/useNavbar";
-import type { PBUser_t } from "../lib/types";
+import type { t_pb_User } from "../lib/types";
 import { logout } from "@/lib/auth";
 import { recordToImageUrl } from "@/lib/pbaseClient";
 
@@ -91,7 +91,7 @@ export default function Navbar({}) {
 }
 
 type Props = {
-  user: PBUser_t | null;
+  user: t_pb_User | null;
   onNavigate: (url: { url: string; msg?: string }) => void;
   forcedDisable?: boolean;
   defaultToShown: boolean;

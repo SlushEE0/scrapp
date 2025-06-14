@@ -8,7 +8,9 @@ const pbServer = new PocketBase(process.env.NEXT_PUBLIC_PB_URL || "");
 
 export async function setPocketbaseCookie(value: string) {
   const cookieStore = await cookies();
-  cookieStore.set("pb_auth", value);
+  cookieStore.set("pb_auth", value, {
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+  });
 
   console.log("Pocketbase cookie set:", value);
 }

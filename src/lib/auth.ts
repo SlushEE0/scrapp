@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
 import { pb } from "./pbaseClient";
-import { PBUser_t } from "./types";
+import { t_pb_User } from "./types";
 import { BaseStates } from "./states";
 import { getPocketbaseCookie, setPocketbaseCookie } from "./pbaseServer";
 
@@ -76,11 +76,16 @@ async function storeServerCookie() {
 }
 
 export function registerAuthCallback(
-  setUser: Dispatch<SetStateAction<PBUser_t | null>>
+  setUser: Dispatch<SetStateAction<t_pb_User | null>>
 ) {
+  pb.collection("users")
+    .authRefresh({ requestKey: null })
+    .then((model) => {
+      setUser(model.record as t_pb_User);
+    });
   return pb.authStore.onChange(() => {
-    const user = pb.authStore.record;
-    setUser(user as any);
+    const record = pb.authStore.record;
+    setUser(record as any);
   }, true);
 }
 
