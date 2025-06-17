@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { pb } from "@/lib/pbaseClient";
-import type { t_pb_User, t_pb_UserData } from "@/lib/types";
+import { pb, recordToImageUrl } from "@/lib/pbaseClient";
+import type { t_pb_UserData } from "@/lib/types";
 import { formatPbDate } from "@/lib/utils";
 
 import {
@@ -26,33 +26,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Edit2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Interfaces and types
-interface UserDataWithUser extends t_pb_UserData {
-  expand?: {
-    user: t_pb_User;
-  };
-}
-
-interface PaginatedResponse {
-  items: UserDataWithUser[];
-  page: number;
-  perPage: number;
-  totalItems: number;
-  totalPages: number;
-}
-
-interface OutreachTableProps {
-  allUsers: UserDataWithUser[];
+type OutreachTableProps = {
+  allUsers: t_pb_UserData[];
   isAdmin: boolean;
   isLoading: boolean;
   isLoadingMore: boolean;
   handleScroll: (e: React.UIEvent<HTMLDivElement>) => void;
   onUpdate: () => void;
-}
+};
 
 // Helper functions
-function formatMinutes(minutes: number): string {
+export function formatMinutes(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   if (hours > 0) {
@@ -61,13 +47,7 @@ function formatMinutes(minutes: number): string {
   return `${mins}m`;
 }
 
-function EditUserDialog({
-  userData,
-  onUpdate
-}: {
-  userData: UserDataWithUser;
-  onUpdate: () => void;
-}) {
+function EditUserDialog({ userData }: { userData: t_pb_UserData }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -81,7 +61,6 @@ function EditUserDialog({
 
     try {
       await pb.collection("userData").update(userData.id, formData);
-      onUpdate();
       setOpen(false);
     } catch (error) {
       console.error("Failed to update user data:", error);
@@ -148,12 +127,10 @@ export function OutreachTable({
   allUsers,
   isAdmin,
   isLoading,
-  isLoadingMore,
-  handleScroll,
-  onUpdate
+  isLoadingMore
 }: OutreachTableProps) {
   return (
-    <ScrollArea className="h-[600px]" onScrollCapture={handleScroll}>
+    <ScrollArea className="h-[600px]">
       <Table>
         <TableHeader>
           <TableRow>
@@ -184,9 +161,18 @@ export function OutreachTable({
               <TableRow key={userData.id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      {userData.expand?.user?.name?.[0]?.toUpperCase() || "?"}
-                    </div>
+                    <Avatar>
+                      <AvatarImage
+                        src={recordToImageUrl(
+                          userData.expand?.user
+                        )?.toString()}
+                        alt={userData.expand?.user.name}
+                        className="rounded-full"
+                      />
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-full flex items-center justify-center h-full w-full">
+                        {userData.expand?.user.name.charAt(0) || "?"}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <div className="font-medium">
                         {userData.expand?.user?.name || "Unknown"}
@@ -203,7 +189,7 @@ export function OutreachTable({
                 </TableCell>
                 {isAdmin && (
                   <TableCell>
-                    <EditUserDialog userData={userData} onUpdate={onUpdate} />
+                    <EditUserDialog userData={userData} />
                   </TableCell>
                 )}
               </TableRow>

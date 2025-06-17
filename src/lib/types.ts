@@ -22,4 +22,7 @@ export interface t_pb_UserData extends RecordModel {
   buildMinutes: number;
   lastOutreachEvent: string;
   lastBuildEvent: string;
+  expand?: {
+    user: t_pb_User;
+  };
 }

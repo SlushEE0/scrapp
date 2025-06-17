@@ -1,9 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
-
 import { pb } from "./pbaseClient";
-import { t_pb_User } from "./types";
 import { BaseStates } from "./states";
-import { getPocketbaseCookie, setPocketbaseCookie } from "./pbaseServer";
+import { setPocketbaseCookie } from "./pbaseServer";
 
 export async function loginEmailPass(
   email: string,
@@ -43,28 +40,6 @@ export async function loginOAuth_Discord() {
   else return BaseStates.ERROR;
 }
 
-export async function createUser(
-  email: string,
-  password: string,
-  name: string
-) {
-  try {
-    const authData = await pb.collection("users").create({
-      email,
-      password,
-      passwordConfirm: password,
-      name
-    });
-
-    if (authData.id) return BaseStates.SUCCESS;
-    else return BaseStates.ERROR;
-  } catch (error) {
-    console.log("User creation failed:", error);
-
-    return BaseStates.ERROR;
-  }
-}
-
 async function storeServerCookie() {
   setPocketbaseCookie(
     pb.authStore.exportToCookie({
@@ -73,20 +48,6 @@ async function storeServerCookie() {
       sameSite: "lax"
     })
   );
-}
-
-export function registerAuthCallback(
-  setUser: Dispatch<SetStateAction<t_pb_User | null>>
-) {
-  pb.collection("users")
-    .authRefresh({ requestKey: null })
-    .then((model) => {
-      setUser(model.record as t_pb_User);
-    });
-  return pb.authStore.onChange(() => {
-    const record = pb.authStore.record;
-    setUser(record as any);
-  }, true);
 }
 
 export function logout() {

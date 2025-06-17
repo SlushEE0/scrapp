@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { registerAuthCallback } from "@/lib/auth"; // adjust path to your PocketBase instance
+import { registerAuthCallback } from "@/lib/db/user";
 import type { t_pb_User } from "@/lib/types";
 
 import { pb } from "@/lib/pbaseClient";

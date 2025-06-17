@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -23,9 +23,10 @@ import {
 } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
 import PasswordBlock from "../PasswordBlock";
+import Image from "next/image";
 
 export default function LoginForm() {
-  const { setRenderOnlyHome } = useNavbar();
+  const { setRenderOnlyHome, setForcedDisable: setDefaultShown } = useNavbar();
 
   const router = useRouter();
 
@@ -34,27 +35,13 @@ export default function LoginForm() {
     password: ""
   });
 
-  useEffect(() => {
-    setRenderOnlyHome(true);
-
-    window.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        handleSubmit();
-      }
-    });
-
-    return () => {
-      setRenderOnlyHome(false);
-    };
-  }, []);
-
-  const redirectToHome = function () {
+  const redirectToHome = useCallback(() => {
     console.log("Redirecting ...");
 
     setTimeout(() => {
       router.push("/");
     }, 500);
-  };
+  }, []);
 
   const handleGoogleOAuth = async function () {
     const loader = toast.loading("Continue on the popup ...");
@@ -94,7 +81,7 @@ export default function LoginForm() {
     }
   };
 
-  const handleSubmit = async function () {
+  const handleSubmit = useCallback(async () => {
     let { email, password } = loginData;
 
     console.log("Form submitted with:", { email, password });
@@ -143,7 +130,23 @@ export default function LoginForm() {
         toast.error("Email or password is incorrect.");
         break;
     }
-  };
+  }, [loginData, redirectToHome]);
+
+  useEffect(() => {
+    setRenderOnlyHome(true);
+    setDefaultShown(false);
+
+    window.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleSubmit();
+      }
+    });
+
+    return () => {
+      setRenderOnlyHome(false);
+      setDefaultShown(true);
+    };
+  }, [handleSubmit, setDefaultShown, setRenderOnlyHome]);
 
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -165,10 +168,12 @@ export default function LoginForm() {
                     variant="outline"
                     className="w-full"
                     onClick={handleGoogleOAuth}>
-                    <img
+                    <Image
                       src="/google.svg"
                       alt="Google Logo"
-                      className="h-4 w-4 mr-2"
+                      className="mr-2"
+                      width={16}
+                      height={16}
                     />
                     Continue with Google
                   </Button>
@@ -176,10 +181,12 @@ export default function LoginForm() {
                     variant="outline"
                     className="w-full"
                     onClick={handleDiscordOAuth}>
-                    <img
+                    <Image
                       src="/discord.svg"
                       alt="Discord Logo"
-                      className="h-4 w-4 mr-2"
+                      className="mr-2"
+                      width={16}
+                      height={16}
                     />
                     Continue with Discord
                   </Button>
@@ -224,7 +231,7 @@ export default function LoginForm() {
                       name="password"
                       type="password"
                       className="bg-input border-border text-foreground"
-                      onChange={(e: any) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setLoginData((d) => ({
                           ...d,
                           password: e.target.value
