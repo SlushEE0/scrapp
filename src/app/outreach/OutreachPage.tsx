@@ -11,6 +11,7 @@ import { formatMinutes, OutreachTable } from "@/app/outreach/OutreachTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 20;
 
@@ -34,8 +35,7 @@ const fetcher = async (url: string): Promise<PaginatedResponse> => {
   const response = await pb
     .collection("UserData")
     .getList<t_pb_UserData>(pageNum, PAGE_SIZE, {
-      expand: "user",
-      sort: "-updated"
+      expand: "user"
     });
 
   return response;
@@ -62,6 +62,10 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
     setDefaultShown(false);
   }, [setDefaultShown]);
 
+  useEffect(() => {
+    loadMore();
+  });
+
   const allUsers = data ? data.flatMap((page) => page.items) : [];
   const totalItems = data?.[0]?.totalItems || 0;
   const hasMore = allUsers.length < totalItems;
@@ -74,21 +78,12 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
     }
   }, [hasMore, isLoadingMore, setSize, size]);
 
-  const handleScroll = useCallback(
-    (e: React.UIEvent<HTMLDivElement>) => {
-      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-      if (scrollHeight - scrollTop <= clientHeight * 1.5) {
-        loadMore();
-      }
-    },
-    [loadMore]
-  );
-
   const handleUpdate = useCallback(() => {
     mutate();
   }, [mutate]);
 
   if (error) {
+    console.error("Error loading outreach data:", error);
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -104,7 +99,7 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
   }
 
   return (
-    <div className="container mx-auto py-6 px-4">
+    <div className="container mx-auto">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-2">
@@ -119,8 +114,8 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card>
+      <div className="flex gap-4 mb-5">
+        <Card className="w-max">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <section className="flex gap-5">
               <Avatar className="h-11 w-11">
@@ -148,7 +143,7 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="f grow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Outreach Hours
@@ -172,7 +167,6 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
         isAdmin={isAdmin}
         isLoading={isLoading}
         isLoadingMore={isLoadingMore || false}
-        handleScroll={handleScroll}
         onUpdate={handleUpdate}
       />
     </div>

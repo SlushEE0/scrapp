@@ -24,11 +24,6 @@ export async function newUser(email: string, password: string, name: string) {
     return [PB_Codes[res1[0].status as keyof typeof PB_Codes], null];
   }
 
-  const res2 = await create_UserData(res1[1] || "");
-  if (res2[0] instanceof ClientResponseError) {
-    return [PB_Codes[res2[0].status as keyof typeof PB_Codes], null];
-  }
-
   return [null, res1[1]];
 }
 
@@ -51,22 +46,6 @@ export async function create_User(
     console.log("User creation failed:", error);
 
     return [error, null];
-  }
-}
-
-export async function create_UserData(id: string): PromiseStateTuple {
-  try {
-    const userData = await pb.collection("userData").create({
-      outreachMinutes: 0,
-      buildMinutes: 0,
-      user: id
-    });
-
-    return [null, userData.id];
-  } catch (error: any) {
-    console.log("User data creation failed:", error);
-
-    return [error as ClientResponseError, null];
   }
 }
 

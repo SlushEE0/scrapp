@@ -246,9 +246,14 @@ function Desktop({ user, onNavigate, defaultToShown }: Props) {
           <div className="flex items-center space-x-3 pl-6 border-l border-border">
             {user ? (
               <>
-                <span className="text-sm font-medium text-foreground">
-                  {user.name}
-                </span>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium text-foreground">
+                    {user.name}
+                  </span>
+                  <span className="text-sm font-sm text-muted-foreground">
+                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  </span>
+                </div>
                 <Avatar className="h-8 w-8">
                   <AvatarImage
                     src={recordToImageUrl(user)?.toString()}

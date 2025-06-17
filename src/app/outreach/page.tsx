@@ -24,14 +24,11 @@ export default async function ServerDataFetcher() {
     return [data, authRecord];
   });
 
-  console.log("user", user);
   if (!user.id) {
     redirect("/auth/login");
   }
 
   const isAdmin = user.role === "admin";
-
-  console.log("userData", userData);
 
   return <OutreachPage {...{ isAdmin, userData }} />;
 }

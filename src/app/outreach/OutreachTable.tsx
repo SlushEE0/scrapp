@@ -33,7 +33,6 @@ type OutreachTableProps = {
   isAdmin: boolean;
   isLoading: boolean;
   isLoadingMore: boolean;
-  handleScroll: (e: React.UIEvent<HTMLDivElement>) => void;
   onUpdate: () => void;
 };
 
@@ -131,7 +130,7 @@ export function OutreachTable({
 }: OutreachTableProps) {
   return (
     <ScrollArea className="h-[600px]">
-      <Table>
+      <Table className="w-full">
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
