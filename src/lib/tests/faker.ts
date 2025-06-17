@@ -60,7 +60,7 @@ export async function populateFakeOutreachSessions(count: number) {
       const randUser = faker.number.int({ min: 2, max: numUsers - 1 });
       const user = await pb.collection("users").getList(randUser, 1);
 
-      const minutes = faker.number.int({ min: 1, max: 120 });
+      const minutes = faker.number.int({ min: 1, max: 900 });
 
       try {
         await pb.collection("OutreachSessions").create({

@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={"dark"}>
         <main
-          className={`z-0 absolute w-full ${geistSans.className} antialiased`}>
+          className={`w-full ${geistSans.className} antialiased`}>
           <Navbar />
           <Toaster />
           {children}

@@ -7,22 +7,30 @@ import type { t_pb_User, t_pb_UserData } from "@/lib/types";
 import OutreachPage from "./OutreachPage";
 
 export default async function ServerDataFetcher() {
-  const [userData, user] = await usePocketbase(async (pb) => {
-    let authRecord = pb.authStore.record as t_pb_User;
+  const [userData, user, outreachMinutesCutoff] = await usePocketbase(
+    async (pb) => {
+      let authRecord = pb.authStore.record as t_pb_User;
 
-    let data: t_pb_UserData | undefined;
-    try {
-      data = await pb
-        .collection("UserData")
-        .getFirstListItem<t_pb_UserData>(`user="wo294dln2thb20j"`, {
-          expand: "user"
-        });
-    } catch (e) {
-      console.warn(`[OutreachPage: "${authRecord?.id}"]`, e);
+      let data: t_pb_UserData | undefined;
+      let outreachMinutesCutoff = 900;
+      try {
+        data = await pb
+          .collection("UserData")
+          .getFirstListItem<t_pb_UserData>(`user="wo294dln2thb20j"`, {
+            expand: "user"
+          });
+        const record = await pb
+          .collection("Settings")
+          .getFirstListItem("key='outreachMinutesCutoff'");
+
+        outreachMinutesCutoff = parseInt(record.value) || 900;
+      } catch (e) {
+        console.warn(`[OutreachPage: "${authRecord?.id}"]`, e);
+      }
+
+      return [data, authRecord, outreachMinutesCutoff];
     }
-
-    return [data, authRecord];
-  });
+  );
 
   if (!user.id) {
     redirect("/auth/login");
@@ -30,5 +38,5 @@ export default async function ServerDataFetcher() {
 
   const isAdmin = user.role === "admin";
 
-  return <OutreachPage {...{ isAdmin, userData }} />;
+  return <OutreachPage {...{ isAdmin, userData, outreachMinutesCutoff }} />;
 }

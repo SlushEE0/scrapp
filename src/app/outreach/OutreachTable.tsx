@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import type { t_pb_UserData } from "@/lib/types";
-import { formatPbDate } from "@/lib/utils";
+import { formatMinutes, formatPbDate } from "@/lib/utils";
 
 import {
   Table,
@@ -34,17 +34,8 @@ type OutreachTableProps = {
   isLoading: boolean;
   isLoadingMore: boolean;
   onUpdate: () => void;
+  outreachMinutesCutoff: number;
 };
-
-// Helper functions
-export function formatMinutes(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  if (hours > 0) {
-    return `${hours}h ${mins}m`;
-  }
-  return `${mins}m`;
-}
 
 function EditUserDialog({ userData }: { userData: t_pb_UserData }) {
   const [open, setOpen] = useState(false);
@@ -121,21 +112,156 @@ function EditUserDialog({ userData }: { userData: t_pb_UserData }) {
   );
 }
 
+const SortedTableHeads = [
+  {
+    key: "user",
+    name: "User",
+    info: "`(${allUsers.length})`",
+    descending: "Z > A",
+    ascending: "A > Z",
+    noSort: "",
+    isSortable: true
+  },
+  {
+    key: "outreachMinutes",
+    name: "Outreach Time",
+    ascending: "Low > High",
+    descending: "High > Low",
+    noSort: "",
+    isSortable: true
+  },
+  {
+    key: "lastOutreachEvent",
+    name: "Last Outreach Event",
+    ascending: "Old > New",
+    descending: "New > Old",
+    noSort: "",
+    isSortable: true
+  }
+];
+
 // Main OutreachTable component
 export function OutreachTable({
   allUsers,
   isAdmin,
   isLoading,
-  isLoadingMore
+  isLoadingMore,
+  outreachMinutesCutoff
 }: OutreachTableProps) {
+  const [sortedUsers, setSortedUsers] = useState(allUsers);
+
+  const [sortConfig, setSortConfig] = useState({
+    key: "user",
+    direction: "ascending"
+  });
+
+  useEffect(() => {
+    const sortUsers = (users: t_pb_UserData[], config: typeof sortConfig) => {
+      return [...users].sort((a, b) => {
+        let aValue, bValue;
+
+        switch (config.key) {
+          case "user":
+            aValue = a.expand?.user?.name || "";
+            bValue = b.expand?.user?.name || "";
+            break;
+          case "outreachMinutes":
+            aValue = a.outreachMinutes || 0;
+            bValue = b.outreachMinutes || 0;
+            break;
+          case "lastOutreachEvent":
+            aValue = new Date(a.lastOutreachEvent).getTime();
+            bValue = new Date(b.lastOutreachEvent).getTime();
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) {
+          return config.direction === "ascending" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return config.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    };
+
+    setSortedUsers(sortUsers(allUsers, sortConfig));
+  }, [allUsers, sortConfig]);
+
+  const getMinutesStatusBadge = function (minutes: number) {
+    const MEETS_TIME = outreachMinutesCutoff;
+    const APPROACHING_TIME = outreachMinutesCutoff - 60 * 3; // 3 hours before cutoff
+
+    const formattedTime = formatMinutes(minutes);
+
+    if (minutes >= MEETS_TIME) {
+      return (
+        <Badge className="bg-green-500/20 text-green-500">
+          {formattedTime}
+        </Badge>
+      );
+    } else if (minutes >= APPROACHING_TIME) {
+      return (
+        <Badge className="bg-amber-500/20 text-amber-500">
+          {formattedTime}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge className="bg-destructive/20 text-destructive">
+          {formattedTime}
+        </Badge>
+      );
+    }
+  };
+
   return (
-    <ScrollArea className="h-[600px]">
+    <ScrollArea className="h-full">
       <Table className="w-full">
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
-            <TableHead>Outreach Hours</TableHead>
-            <TableHead>Last Outreach Event</TableHead>
+            {SortedTableHeads.map((head) => (
+              <TableHead
+                key={head.key}
+                className="cursor-pointer relative"
+                style={{
+                  minWidth:
+                    head.key === "user"
+                      ? "300px"
+                      : head.key === "outreachMinutes"
+                      ? "150px"
+                      : "200px"
+                }}
+                onClick={() => {
+                  setSortConfig((prev) => {
+                    const newDirection =
+                      prev.key === head.key && prev.direction === "ascending"
+                        ? "descending"
+                        : "ascending";
+                    return { key: head.key, direction: newDirection };
+                  });
+                }}>
+                <div className="flex items-center justify-baseline gap-5">
+                  <span>
+                    {head.name}{" "}
+                    <span className="text-muted-foreground">
+                      {eval(head.info || "")}
+                    </span>
+                  </span>
+                  <div className="w-20">
+                    {sortConfig.key === head.key && (
+                      <Badge className="text-xs">
+                        {sortConfig.direction === "ascending"
+                          ? head.ascending
+                          : head.descending}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </TableHead>
+            ))}
             {isAdmin && <TableHead>Manage</TableHead>}
           </TableRow>
         </TableHeader>
@@ -156,7 +282,7 @@ export function OutreachTable({
               </TableCell>
             </TableRow>
           ) : (
-            allUsers.map((userData) => (
+            sortedUsers.map((userData) => (
               <TableRow key={userData.id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
@@ -182,7 +308,9 @@ export function OutreachTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{formatMinutes(userData.outreachMinutes)}</TableCell>
+                <TableCell>
+                  {getMinutesStatusBadge(userData.outreachMinutes)}
+                </TableCell>
                 <TableCell>
                   {formatPbDate(userData.lastOutreachEvent) || "N/A"}
                 </TableCell>

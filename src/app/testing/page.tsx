@@ -8,9 +8,11 @@ import {
 
 export default function ({}) {
   const yay = async function () {
-    await populateFakeUsers(15);
-    populateFakeOutreachSessions(15);
+    // await populateFakeUsers(15);
+    populateFakeOutreachSessions(28);
   };
 
   return <Button onClick={yay}>ALSfkjlashdf</Button>;
+
+  // return <Chip color="warning" variant="flat">{"nignigngin"}</Chip>;
 }

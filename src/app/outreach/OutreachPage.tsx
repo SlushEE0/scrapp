@@ -6,14 +6,14 @@ import useSWRInfinite from "swr/infinite";
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import { useNavbar } from "@/hooks/useNavbar";
 import type { t_pb_UserData } from "@/lib/types";
-import { formatMinutes, OutreachTable } from "@/app/outreach/OutreachTable";
+import { OutreachTable } from "@/app/outreach/OutreachTable";
+import { formatMinutes } from "@/lib/utils";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Clock } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { Button } from "@/components/ui/button";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 interface PaginatedResponse {
   items: t_pb_UserData[];
@@ -26,6 +26,7 @@ interface PaginatedResponse {
 type Props = {
   isAdmin?: boolean;
   userData?: t_pb_UserData;
+  outreachMinutesCutoff: number;
 };
 
 const fetcher = async (url: string): Promise<PaginatedResponse> => {
@@ -49,7 +50,11 @@ const getKey = (
   return `?page=${pageIndex + 1}`;
 };
 
-export default function OutreachPage({ isAdmin = false, userData }: Props) {
+export default function OutreachPage({
+  isAdmin = false,
+  userData,
+  outreachMinutesCutoff
+}: Props) {
   const { setDefaultShown } = useNavbar();
 
   const { data, error, size, setSize, isValidating, mutate } =
@@ -99,9 +104,9 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto h-screen flex flex-col pt-3">
       {/* Header */}
-      <div className="mb-6">
+      <div className="flex-shrink-0 mb-4">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-6 w-6" />
           <h1 className="text-3xl font-bold">Outreach Dashboard</h1>
@@ -114,9 +119,9 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
       </div>
 
       {/* Stats Cards */}
-      <div className="flex gap-4 mb-5">
-        <Card className="w-max">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <div className="flex gap-4 mb-4 flex-shrink-0">
+        <Card className="w-max px-2">
+          <CardHeader className="pb-0 mb-0">
             <section className="flex gap-5">
               <Avatar className="h-11 w-11">
                 <AvatarImage
@@ -138,12 +143,12 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl text-primary">
-              <span className="text-primary-foreground">Outreach Hours: </span>
+              <span className="text-foreground">Outreach Hours: </span>
               {formatMinutes(userData?.outreachMinutes || 0)}
             </div>
           </CardContent>
         </Card>
-        <Card className="f grow">
+        <Card className="grow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Outreach Hours
@@ -162,13 +167,17 @@ export default function OutreachPage({ isAdmin = false, userData }: Props) {
         </Card>
       </div>
 
-      <OutreachTable
-        allUsers={allUsers}
-        isAdmin={isAdmin}
-        isLoading={isLoading}
-        isLoadingMore={isLoadingMore || false}
-        onUpdate={handleUpdate}
-      />
+      {/* Table Container - Takes remaining space */}
+      <div className="flex-1 min-h-0">
+        <OutreachTable
+          allUsers={allUsers}
+          isAdmin={isAdmin}
+          isLoading={isLoading}
+          isLoadingMore={isLoadingMore || false}
+          onUpdate={handleUpdate}
+          outreachMinutesCutoff={outreachMinutesCutoff}
+        />
+      </div>
     </div>
   );
 }
