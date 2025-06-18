@@ -5,9 +5,10 @@ import useSWRInfinite from "swr/infinite";
 
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import { useNavbar } from "@/hooks/useNavbar";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { t_pb_UserData } from "@/lib/types";
-import { OutreachTable } from "@/app/outreach/OutreachTable";
+
 import { formatMinutes, getBadgeStatusStyles } from "@/lib/utils";
 
 import { Users, Clock } from "lucide-react";
@@ -15,6 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { OutreachTable } from "./OutreachTable";
+import Loader from "@/components/Loader";
 
 const PAGE_SIZE = 15;
 
@@ -59,16 +62,30 @@ export default function OutreachPage({
   outreachMinutesCutoff
 }: Props) {
   const { setDefaultShown } = useNavbar();
+  const isHydrated = useIsHydrated();
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    setDefaultShown(false);
-  }, [setDefaultShown]);
   const { data, error, size, setSize, isValidating, mutate } =
     useSWRInfinite<PaginatedResponse>(getKey, fetcher, {
       revalidateOnFocus: false,
       revalidateOnReconnect: true
     });
+
+  const allUsers = data ? data.flatMap((page) => page.items) : [];
+  const totalItems = data?.[0]?.totalItems || 0;
+  const hasMore = allUsers.length < totalItems;
+  const isLoading = !data && !error;
+  const isLoadingMore = isValidating && data && data.length > 0;
+
+  const loadMore = useCallback(() => {
+    if (hasMore && !isLoadingMore) {
+      setSize(size + 1);
+    }
+  }, [hasMore, isLoadingMore, setSize, size]);
+
+  const handleUpdate = useCallback(() => {
+    mutate();
+  }, [mutate]);
 
   useEffect(() => {
     setDefaultShown(false);
@@ -78,28 +95,7 @@ export default function OutreachPage({
     loadMore();
   });
 
-  const allUsers = data ? data.flatMap((page) => page.items) : [];
-  const totalItems = data?.[0]?.totalItems || 0;
-  const hasMore = allUsers.length < totalItems;
-  const isLoading = !data && !error;
-  const isLoadingMore = isValidating && data && data.length > 0;
-
-  console.log("OutreachPage data:", {
-    totalItems,
-    hasMore,
-    isLoading,
-    isLoadingMore,
-    allUsers
-  });
-
-  const loadMore = useCallback(() => {
-    if (hasMore && !isLoadingMore) {
-      setSize(size + 1);
-    }
-  }, [hasMore, isLoadingMore, setSize, size]);
-  const handleUpdate = useCallback(() => {
-    mutate();
-  }, [mutate]);
+  if (!isHydrated) return <Loader />;
 
   if (error) {
     console.error("Error loading outreach data:", error);

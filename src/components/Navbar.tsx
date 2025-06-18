@@ -4,24 +4,24 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { User, FileSpreadsheet, Clock, Signature } from "lucide-react";
-
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-
 import { useUser } from "@/hooks/useUser";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavbar } from "@/hooks/useNavbar";
-import type { t_pb_User } from "../lib/types";
-import { logout } from "@/lib/auth";
 import { recordToImageUrl } from "@/lib/pbaseClient";
+import { logout } from "@/lib/auth";
+import type { t_pb_User } from "@/lib/types";
+
+import { User, FileSpreadsheet, Clock, Signature } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 const allItems = [
   {
     onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
     label: "Home",
-    url: "/home",
+    url: "/",
     msg: "Going Home"
   },
   {
@@ -58,14 +58,15 @@ const allItems = [
 let navItems = allItems;
 
 export default function Navbar({}) {
-  const isMobile = useIsMobile(true);
-  const { user } = useUser();
-
-  const state = useNavbar();
-
   const router = useRouter();
 
-  type NavigateParams = { url: string; msg?: string; func?: () => boolean };
+  const isMobile = useIsMobile(true);
+  const state = useNavbar();
+  const isHydrated = useIsHydrated();
+
+  const { user } = useUser();
+
+  if (!isHydrated) return;
 
   navItems = state.renderOnlyHome
     ? navItems.filter((item) => item.onlyHomePersist)
@@ -75,7 +76,11 @@ export default function Navbar({}) {
     url,
     msg,
     func = () => true
-  }: NavigateParams) {
+  }: {
+    url: string;
+    msg?: string;
+    func?: () => boolean;
+  }) {
     toast(`${msg}`);
 
     if (func()) router.push(url);

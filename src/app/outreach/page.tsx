@@ -1,10 +1,12 @@
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
 import { runPocketbase } from "@/lib/pbaseServer";
-
 import type { t_pb_User, t_pb_UserData } from "@/lib/types";
 
 import OutreachPage from "./OutreachPage";
+import Loader from "@/components/Loader";
 
 export default async function ServerDataFetcher() {
   const [userData, user, outreachMinutesCutoff] = await runPocketbase(

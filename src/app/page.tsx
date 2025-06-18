@@ -1,5 +1,4 @@
 export default function Home() {
-
   return (
     <main className="pt-20">
       <div className="flex justify-center items-center h-screen">
