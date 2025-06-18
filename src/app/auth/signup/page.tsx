@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -38,22 +38,6 @@ export default function LoginForm() {
     password2: ""
   });
 
-  useEffect(() => {
-    setRenderOnlyHome(true);
-    setDefaultShown(false);
-
-    window.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        handleSubmit();
-      }
-    });
-
-    return () => {
-      setRenderOnlyHome(false);
-      setDefaultShown(true);
-    };
-  }, []);
-
   const handleGoogleOAuth = function () {
     loginOAuth_Google();
   };
@@ -62,7 +46,7 @@ export default function LoginForm() {
     loginOAuth_Discord();
   };
 
-  const handleSubmit = async function () {
+  const handleSubmit = useCallback(async () => {
     let { name, email, password1, password2 } = userData;
 
     console.log("Form submitted with:", { name, email, password1, password2 });
@@ -158,7 +142,23 @@ export default function LoginForm() {
         toast.error("Something went wrong :(");
         break;
     }
-  };
+  }, [userData, router, setUserData]);
+
+  useEffect(() => {
+    setRenderOnlyHome(true);
+    setDefaultShown(false);
+
+    window.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        handleSubmit();
+      }
+    });
+
+    return () => {
+      setRenderOnlyHome(false);
+      setDefaultShown(true);
+    };
+  }, [handleSubmit, setRenderOnlyHome, setDefaultShown]);
 
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">

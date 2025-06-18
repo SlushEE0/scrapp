@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import type { t_pb_UserData } from "@/lib/types";
-import { formatMinutes, formatPbDate } from "@/lib/utils";
+import { formatMinutes, formatPbDate, getBadgeStatusStyles } from "@/lib/utils";
 
 import {
   Table,
@@ -25,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Edit2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -35,6 +37,7 @@ type OutreachTableProps = {
   isLoadingMore: boolean;
   onUpdate: () => void;
   outreachMinutesCutoff: number;
+  isMobile?: boolean;
 };
 
 function EditUserDialog({ userData }: { userData: t_pb_UserData }) {
@@ -146,7 +149,8 @@ export function OutreachTable({
   isAdmin,
   isLoading,
   isLoadingMore,
-  outreachMinutesCutoff
+  outreachMinutesCutoff,
+  isMobile = false
 }: OutreachTableProps) {
   const [sortedUsers, setSortedUsers] = useState(allUsers);
 
@@ -186,37 +190,144 @@ export function OutreachTable({
         return 0;
       });
     };
-
     setSortedUsers(sortUsers(allUsers, sortConfig));
   }, [allUsers, sortConfig]);
 
-  const getMinutesStatusBadge = function (minutes: number) {
-    const MEETS_TIME = outreachMinutesCutoff;
-    const APPROACHING_TIME = outreachMinutesCutoff - 60 * 3; // 3 hours before cutoff
+  // Mobile Card Layout
+  if (isMobile) {
+    return (
+      <ScrollArea className="h-full">
+        <div className="space-y-3">
+          {/* Sort Controls for Mobile */}
+          <div className="flex gap-2 p-2 bg-muted/50 rounded-lg">
+            <Button
+              variant={sortConfig.key === "user" ? "default" : "outline"}
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={() => {
+                setSortConfig((prev) => ({
+                  key: "user",
+                  direction:
+                    prev.key === "user" && prev.direction === "ascending"
+                      ? "descending"
+                      : "ascending"
+                }));
+              }}>
+              Name{" "}
+              {sortConfig.key === "user" &&
+                (sortConfig.direction === "ascending" ? "↑" : "↓")}
+            </Button>
+            <Button
+              variant={
+                sortConfig.key === "outreachMinutes" ? "default" : "outline"
+              }
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={() => {
+                setSortConfig((prev) => ({
+                  key: "outreachMinutes",
+                  direction:
+                    prev.key === "outreachMinutes" &&
+                    prev.direction === "ascending"
+                      ? "descending"
+                      : "ascending"
+                }));
+              }}>
+              Time{" "}
+              {sortConfig.key === "outreachMinutes" &&
+                (sortConfig.direction === "ascending" ? "↑" : "↓")}
+            </Button>
+            <Button
+              variant={
+                sortConfig.key === "lastOutreachEvent" ? "default" : "outline"
+              }
+              size="sm"
+              className="flex-1 text-xs"
+              onClick={() => {
+                setSortConfig((prev) => ({
+                  key: "lastOutreachEvent",
+                  direction:
+                    prev.key === "lastOutreachEvent" &&
+                    prev.direction === "ascending"
+                      ? "descending"
+                      : "ascending"
+                }));
+              }}>
+              Date{" "}
+              {sortConfig.key === "lastOutreachEvent" &&
+                (sortConfig.direction === "ascending" ? "↑" : "↓")}
+            </Button>
+          </div>
 
-    const formattedTime = formatMinutes(minutes);
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                Loading...
+              </div>
+            </div>
+          ) : allUsers.length === 0 ? (
+            <div className="text-center py-8">No user data found</div>
+          ) : (
+            sortedUsers.map((userData) => (
+              <Card key={userData.id} className="p-4">
+                <CardContent className="p-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
+                        <AvatarImage
+                          src={recordToImageUrl(
+                            userData.expand?.user
+                          )?.toString()}
+                          alt={userData.expand?.user.name}
+                          className="rounded-full"
+                        />
+                        <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-full flex items-center justify-center h-full w-full">
+                          {userData.expand?.user.name.charAt(0) || "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium truncate">
+                          {userData.expand?.user?.name || "Unknown"}
+                        </div>
+                        <div className="text-sm text-muted-foreground truncate">
+                          {userData.expand?.user?.email}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {formatPbDate(userData.lastOutreachEvent) || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      <Badge
+                        className={`${getBadgeStatusStyles(
+                          userData.outreachMinutes,
+                          outreachMinutesCutoff,
+                          60 * 3
+                        )} text-sm`}>
+                        {formatMinutes(userData.outreachMinutes)}
+                      </Badge>
+                      {isAdmin && <EditUserDialog userData={userData} />}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+          {isLoadingMore && (
+            <div className="text-center py-4">
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                Loading more...
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    );
+  }
 
-    if (minutes >= MEETS_TIME) {
-      return (
-        <Badge className="bg-green-500/20 text-green-500">
-          {formattedTime}
-        </Badge>
-      );
-    } else if (minutes >= APPROACHING_TIME) {
-      return (
-        <Badge className="bg-amber-500/20 text-amber-500">
-          {formattedTime}
-        </Badge>
-      );
-    } else {
-      return (
-        <Badge className="bg-destructive/20 text-destructive">
-          {formattedTime}
-        </Badge>
-      );
-    }
-  };
-
+  // Desktop Table Layout
   return (
     <ScrollArea className="h-full">
       <Table className="w-full">
@@ -309,7 +420,14 @@ export function OutreachTable({
                   </div>
                 </TableCell>
                 <TableCell>
-                  {getMinutesStatusBadge(userData.outreachMinutes)}
+                  <Badge
+                    className={`${getBadgeStatusStyles(
+                      userData.outreachMinutes,
+                      outreachMinutesCutoff,
+                      60 * 3
+                    )} text-md`}>
+                    {formatMinutes(userData.outreachMinutes)}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   {formatPbDate(userData.lastOutreachEvent) || "N/A"}

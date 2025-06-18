@@ -5,13 +5,16 @@ import useSWRInfinite from "swr/infinite";
 
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import { useNavbar } from "@/hooks/useNavbar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { t_pb_UserData } from "@/lib/types";
 import { OutreachTable } from "@/app/outreach/OutreachTable";
-import { formatMinutes } from "@/lib/utils";
+import { formatMinutes, getBadgeStatusStyles } from "@/lib/utils";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Clock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 const PAGE_SIZE = 15;
 
@@ -56,7 +59,11 @@ export default function OutreachPage({
   outreachMinutesCutoff
 }: Props) {
   const { setDefaultShown } = useNavbar();
+  const isMobile = useIsMobile();
 
+  useEffect(() => {
+    setDefaultShown(false);
+  }, [setDefaultShown]);
   const { data, error, size, setSize, isValidating, mutate } =
     useSWRInfinite<PaginatedResponse>(getKey, fetcher, {
       revalidateOnFocus: false,
@@ -77,12 +84,19 @@ export default function OutreachPage({
   const isLoading = !data && !error;
   const isLoadingMore = isValidating && data && data.length > 0;
 
+  console.log("OutreachPage data:", {
+    totalItems,
+    hasMore,
+    isLoading,
+    isLoadingMore,
+    allUsers
+  });
+
   const loadMore = useCallback(() => {
     if (hasMore && !isLoadingMore) {
       setSize(size + 1);
     }
   }, [hasMore, isLoadingMore, setSize, size]);
-
   const handleUpdate = useCallback(() => {
     mutate();
   }, [mutate]);
@@ -102,28 +116,35 @@ export default function OutreachPage({
       </div>
     );
   }
-
   return (
-    <div className="container mx-auto h-screen flex flex-col pt-3">
+    <div
+      className={`container mx-auto h-screen flex flex-col ${
+        isMobile ? "pt-2 px-4 pb-20" : "pt-3"
+      }`}>
       {/* Header */}
       <div className="flex-shrink-0 mb-4">
+        {" "}
         <div className="flex items-center gap-2 mb-2">
-          <Users className="h-6 w-6" />
-          <h1 className="text-3xl font-bold">Outreach Dashboard</h1>
+          <Users className={`${isMobile ? "h-5 w-5" : "h-6 w-6"}`} />
+          <h1 className={`${isMobile ? "text-2xl" : "text-3xl"} font-bold`}>
+            {isMobile ? "Outreach" : "Outreach Dashboard"}
+          </h1>
         </div>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {isAdmin
             ? "Manage and view user outreach data"
             : "View outreach data"}
         </p>
       </div>
-
-      {/* Stats Cards */}
-      <div className="flex gap-4 mb-4 flex-shrink-0">
-        <Card className="w-max px-2">
-          <CardHeader className="pb-0 mb-0">
-            <section className="flex gap-5">
-              <Avatar className="h-11 w-11">
+      {/* Stats Cards */}{" "}
+      <div
+        className={`${
+          isMobile ? "flex flex-col gap-3" : "flex gap-4"
+        } mb-4 flex-shrink-0`}>
+        <Card className={`${isMobile ? "w-full" : "w-80"} px-2`}>
+          <CardHeader>
+            <section className="flex gap-3">
+              <Avatar className="h-11 w-11 flex-shrink-0">
                 <AvatarImage
                   src={recordToImageUrl(userData?.expand?.user)?.toString()}
                   alt={userData?.expand?.user.name}
@@ -133,42 +154,52 @@ export default function OutreachPage({
                   {userData?.expand?.user.name.charAt(0) || "?"}
                 </AvatarFallback>
               </Avatar>
-              <div className="">
-                <p>{userData?.expand?.user.name || "Unknown User"}</p>
-                <p className="block text-sm text-muted-foreground">
-                  {userData?.expand?.user.email || "No email"}{" "}
+              <div className="min-w-0 flex-1">
+                <p className="font-medium truncate">
+                  {userData?.expand?.user.name || "Unknown User"}
+                </p>
+                <p className="text-sm text-muted-foreground truncate">
+                  {userData?.expand?.user.email || "No email"}
                 </p>
               </div>
             </section>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl text-primary">
-              <span className="text-foreground">Outreach Hours: </span>
-              {formatMinutes(userData?.outreachMinutes || 0)}
-            </div>
+          <CardContent className="pt-0">
+            {userData?.outreachMinutes && (
+              <div className="flex gap-2">
+                <span className={`${isMobile ? "text-lg" : "text-2xl"}`}>
+                  You Have:
+                </span>
+                <Badge
+                  className={`${getBadgeStatusStyles(
+                    userData.outreachMinutes,
+                    outreachMinutesCutoff,
+                    60 * 3
+                  )} ${isMobile ? "text-lg" : "text-2xl"} w-fit`}>
+                  {formatMinutes(userData.outreachMinutes)}
+                </Badge>
+              </div>
+            )}
           </CardContent>
-        </Card>
-        <Card className="grow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Outreach Hours
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(
-                allUsers.reduce((sum, user) => sum + user.outreachMinutes, 0) /
-                  60
-              )}
-              h
-            </div>
-          </CardContent>
-        </Card>
+        </Card>{" "}
+        {!isMobile && (
+          <Card className="grow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Outreach Hours
+              </CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={"text-2xl font-bold"}>5 h</div>
+            </CardContent>{" "}
+          </Card>
+        )}
       </div>
-
+      <Separator className="w-full mb-5" />
       {/* Table Container - Takes remaining space */}
       <div className="flex-1 min-h-0">
+        {" "}
         <OutreachTable
           allUsers={allUsers}
           isAdmin={isAdmin}
@@ -176,6 +207,7 @@ export default function OutreachPage({
           isLoadingMore={isLoadingMore || false}
           onUpdate={handleUpdate}
           outreachMinutesCutoff={outreachMinutesCutoff}
+          isMobile={isMobile}
         />
       </div>
     </div>

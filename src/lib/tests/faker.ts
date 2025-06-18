@@ -1,7 +1,7 @@
 "use server";
 
 import { faker } from "@faker-js/faker";
-import { usePocketbase as runPocketbase } from "@/lib/pbaseServer";
+import { runPocketbase as runPocketbase } from "@/lib/pbaseServer";
 
 export async function generateFakeUser() {
   return {

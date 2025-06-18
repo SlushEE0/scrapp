@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import PocketBase from "pocketbase";
 
-import { getPocketbaseCookie, usePocketbase } from "./lib/pbaseServer";
+import { runPocketbase } from "./lib/pbaseServer";
 
 const adminPaths = ["/admin", "/testing"];
-const authorizedPaths = ["/", "/profile"];
+const publicPaths = ["/auth/unauthorized", "/auth/login", "/auth/signup"];
 
 export async function middleware(request: NextRequest) {
   const nextUrl = request.nextUrl.clone();
 
-  const authStore = await usePocketbase((pb) => {
+  if (publicPaths.includes(nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
+  const authStore = await runPocketbase((pb) => {
     return pb.authStore;
   });
 
@@ -18,8 +21,19 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.redirect(nextUrl);
   }
-}
 
-export const config = {
-  matcher: ["/admin", "/testing", "/", "/profile"]
-};
+  const role = authStore?.record?.role || "guest";
+
+  if (role === "huhu") {
+    return NextResponse.next();
+  }
+
+  if (adminPaths.includes(nextUrl.pathname)) {
+    nextUrl.searchParams.set("page", nextUrl.pathname);
+    nextUrl.pathname = "/auth/unauthorized";
+
+    return NextResponse.redirect(nextUrl);
+  }
+
+  return NextResponse.next();
+}

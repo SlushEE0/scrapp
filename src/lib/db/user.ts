@@ -10,11 +10,11 @@ type PromiseStateTuple = Promise<StateTuple>;
 
 export async function newUser(email: string, password: string, name: string) {
   try {
-    let exists = await pb
+    const preExisting = await pb
       .collection("users")
       .getFirstListItem(`email="${email}"`);
 
-    if (exists.id) return ["ALREADY_EXISTS", null];
+    if (preExisting.id) return ["ALREADY_EXISTS", null];
   } catch (error: any) {
     console.warn(error);
   }
@@ -33,7 +33,7 @@ export async function create_User(
   name: string
 ): PromiseStateTuple {
   try {
-    let user = await pb.collection("users").create({
+    const user = await pb.collection("users").create({
       email,
       password,
       passwordConfirm: password,

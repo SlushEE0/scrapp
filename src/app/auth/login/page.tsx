@@ -41,7 +41,7 @@ export default function LoginForm() {
     setTimeout(() => {
       router.push("/");
     }, 500);
-  }, []);
+  }, [router]);
 
   const handleGoogleOAuth = async function () {
     const loader = toast.loading("Continue on the popup ...");

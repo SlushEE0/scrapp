@@ -22,19 +22,19 @@ const allItems = [
     icon: <User className="h-5 w-5" />,
     label: "Home",
     url: "/home",
-    msg: "Going to Home"
+    msg: "Going Home"
   },
   {
     icon: <FileSpreadsheet className="h-5 w-5" />,
     label: "Budget",
     url: "/budget",
-    msg: "Going to Budget"
+    msg: "Going to the Budget Sheet"
   },
   {
     icon: <Clock className="h-5 w-5" />,
     label: "Outreach",
     url: "/outreach",
-    msg: "Going to Outreach"
+    msg: "Going to the Outreach Sheet"
   },
   {
     onlyHomePersist: true,
@@ -58,8 +58,8 @@ const allItems = [
 let navItems = allItems;
 
 export default function Navbar({}) {
-  const isMobile = useIsMobile();
-  const { user, setUser } = useUser();
+  const isMobile = useIsMobile(true);
+  const { user } = useUser();
 
   const state = useNavbar();
 
@@ -76,7 +76,7 @@ export default function Navbar({}) {
     msg,
     func = () => true
   }: NavigateParams) {
-    toast(`Navigating to ${url}`);
+    toast(`${msg}`);
 
     if (func()) router.push(url);
   };
@@ -93,11 +93,10 @@ export default function Navbar({}) {
 type Props = {
   user: t_pb_User | null;
   onNavigate: (url: { url: string; msg?: string }) => void;
-  forcedDisable?: boolean;
   defaultToShown: boolean;
 };
 
-function Mobile({ user, onNavigate, forcedDisable }: Props) {
+function Mobile({ user, onNavigate }: Props) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border rounded-t-2xl shadow-2xl">
       <div className="flex items-center justify-around px-3 py-2 transition-all duration-300 ease-in-out">
@@ -198,10 +197,12 @@ function Desktop({ user, onNavigate, defaultToShown }: Props) {
       }
     };
 
-    defaultToShown ? window.addEventListener("scroll", handleScroll) : null;
-    defaultToShown ? handleScroll() : null; // Initial check on mount
-
     window.addEventListener("mousemove", handleMouseMove);
+
+    if (defaultToShown) {
+      window.addEventListener("scroll", handleScroll);
+      handleScroll();
+    }
 
     return () => {
       window.removeEventListener("scroll", handleScroll);

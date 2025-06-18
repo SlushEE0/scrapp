@@ -1,15 +1,15 @@
 import { redirect } from "next/navigation";
 
-import { usePocketbase } from "@/lib/pbaseServer";
+import { runPocketbase } from "@/lib/pbaseServer";
 
 import type { t_pb_User, t_pb_UserData } from "@/lib/types";
 
 import OutreachPage from "./OutreachPage";
 
 export default async function ServerDataFetcher() {
-  const [userData, user, outreachMinutesCutoff] = await usePocketbase(
+  const [userData, user, outreachMinutesCutoff] = await runPocketbase(
     async (pb) => {
-      let authRecord = pb.authStore.record as t_pb_User;
+      const authRecord = pb.authStore.record as t_pb_User;
 
       let data: t_pb_UserData | undefined;
       let outreachMinutesCutoff = 900;
