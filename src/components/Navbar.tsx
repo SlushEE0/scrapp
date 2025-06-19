@@ -15,6 +15,9 @@ import type { t_pb_User } from "@/lib/types";
 import { User, FileSpreadsheet, Clock, Signature } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import NavbarSkeleton from "./skeletons/NavbarSkeleton";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 const allItems = [
   {
@@ -55,7 +58,14 @@ const allItems = [
   // }
 ];
 
-let navItems = allItems;
+export type NavItems = typeof allItems;
+
+type ChildProps = {
+  user: t_pb_User | null;
+  navItems: typeof allItems;
+  onNavigate: (url: { url: string; msg?: string }) => void;
+  defaultToShown: boolean;
+};
 
 export default function Navbar({}) {
   const router = useRouter();
@@ -66,10 +76,10 @@ export default function Navbar({}) {
 
   const { user } = useUser();
 
-  if (!isHydrated) return;
+  if (!isHydrated) return <NavbarSkeleton navItems={allItems} />;
 
-  navItems = state.renderOnlyHome
-    ? navItems.filter((item) => item.onlyHomePersist)
+  const navItems = state.renderOnlyHome
+    ? allItems.filter((item) => item.onlyHomePersist)
     : allItems;
 
   const onNavigate = function ({
@@ -89,19 +99,13 @@ export default function Navbar({}) {
   if (state.forcedDisable) return;
 
   return isMobile ? (
-    <Mobile {...state} {...{ user, onNavigate }} />
+    <Mobile {...state} {...{ navItems, user, onNavigate }} />
   ) : (
-    <Desktop {...state} {...{ user, onNavigate }} />
+    <Desktop {...state} {...{ navItems, user, onNavigate }} />
   );
 }
 
-type Props = {
-  user: t_pb_User | null;
-  onNavigate: (url: { url: string; msg?: string }) => void;
-  defaultToShown: boolean;
-};
-
-function Mobile({ user, onNavigate }: Props) {
+function Mobile({ navItems, user, onNavigate }: ChildProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border rounded-t-2xl shadow-2xl">
       <div className="flex items-center justify-around px-3 py-2 transition-all duration-300 ease-in-out">
@@ -167,7 +171,7 @@ function Mobile({ user, onNavigate }: Props) {
   );
 }
 
-function Desktop({ user, onNavigate, defaultToShown }: Props) {
+function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
   const [isVisible, setIsVisible] = useState(true);
   const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -247,44 +251,48 @@ function Desktop({ user, onNavigate, defaultToShown }: Props) {
                 </span>
               </Button>
             ))}
-          </nav>
 
-          <div className="flex items-center space-x-3 pl-6 border-l border-border">
             {user ? (
-              <>
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-foreground">
-                    {user.name}
-                  </span>
-                  <span className="text-sm font-sm text-muted-foreground">
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                  </span>
-                </div>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={recordToImageUrl(user)?.toString()}
-                    alt={user.name}
-                    className="rounded-full"
-                  />
-                  <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-full flex items-center justify-center h-full w-full">
-                    {user.name.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-              </>
+              <div className="flex items-center space-x-3 pl-6 ml-2 border-l border-border">
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-3 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100 group">
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium text-foreground underline transition-all duration-200 ease-in-out decoration-transparent group-hover:decoration-current">
+                      {user.name}
+                    </span>
+                    <span className="text-sm font-sm text-muted-foreground">
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    </span>
+                  </div>
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={recordToImageUrl(user)?.toString()}
+                      alt={user.name}
+                      className="rounded-full"
+                    />
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-full flex items-center justify-center h-full w-full">
+                      {user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
+              </div>
             ) : (
-              <Button
-                variant="default"
-                size="sm"
-                className="flex items-center space-x-2"
-                onClick={onNavigate.bind(null, {
-                  url: "/auth/login",
-                  msg: "Going to Login"
-                })}>
-                <User className="h-4 w-4" />
-                <span className="text-sm font-medium">Log In</span>
-              </Button>
+              <div className="flex items-center space-x-3 pl-7 ml-2 border-l border-border">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex items-center space-x-3"
+                  onClick={onNavigate.bind(null, {
+                    url: "/auth/login",
+                    msg: "Going to Login"
+                  })}>
+                  <User className="h-4 w-4" />
+                  <span className="text-sm font-medium">Log In</span>
+                </Button>
+              </div>
             )}
-          </div>
+          </nav>
         </div>
       </div>
     </div>

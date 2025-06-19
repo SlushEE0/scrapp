@@ -29,8 +29,6 @@ export async function setPocketbaseCookie(value: string) {
   cookieStore.set("pb_auth", value, {
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
   });
-
-  console.log("Pocketbase cookie set:", value);
 }
 
 export async function getPocketbaseCookie() {
