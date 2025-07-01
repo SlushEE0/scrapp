@@ -70,7 +70,7 @@ type ChildProps = {
 export default function Navbar({}) {
   const router = useRouter();
 
-  const isMobile = useIsMobile(true);
+  const { isSmallScreen, hasTouch } = useIsMobile(true);
   const state = useNavbar();
   const isHydrated = useIsHydrated();
 
@@ -98,7 +98,7 @@ export default function Navbar({}) {
 
   if (state.forcedDisable) return;
 
-  return isMobile ? (
+  return isSmallScreen ? (
     <Mobile {...state} {...{ navItems, user, onNavigate }} />
   ) : (
     <Desktop {...state} {...{ navItems, user, onNavigate }} />
@@ -226,7 +226,7 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
   return (
     <div
       ref={navbarRef}
-      className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out ${
+      className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out w-max ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}>
       <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl px-6 py-3 transition-all duration-300 ease-in-out">
@@ -257,7 +257,7 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                 <Link
                   href="/profile"
                   className="flex items-center space-x-3 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100 group">
-                  <div className="flex flex-col items-start">
+                  <div className="hidden flex-col items-start md:flex">
                     <span className="text-sm font-medium text-foreground underline transition-all duration-200 ease-in-out decoration-transparent group-hover:decoration-current">
                       {user.name}
                     </span>

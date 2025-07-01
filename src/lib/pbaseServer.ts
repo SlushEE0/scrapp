@@ -14,6 +14,8 @@ export async function runPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
 
   const authData = await getPocketbaseCookie();
 
+  console.log("authdata", authData);
+
   pbServer.authStore.loadFromCookie(authData);
   pbServer.collection("users").authRefresh();
 

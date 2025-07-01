@@ -2,32 +2,45 @@ import { useState, useEffect } from "react";
 
 const MOBILE_BREAKPOINT = 650;
 
-export function useIsMobile(touchQuery = false) {
-  const [isMobile, setIsMobile] = useState<boolean | undefined>(undefined);
+// Function overloads for proper typing
+function useIsMobile(queryTouch: true): {
+  hasTouch: boolean | undefined;
+  isSmallScreen: boolean | undefined;
+};
+function useIsMobile(queryTouch?: false): boolean | undefined;
+function useIsMobile(queryTouch = false) {
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean | undefined>(
+    undefined
+  );
+  const [hasTouch, setHasTouch] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    let query = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
-    let onChange: (event: MediaQueryListEvent) => void;
-
-    if (touchQuery) {
-      query = "(hover: none)";
-
-      onChange = (event: MediaQueryListEvent) => {
-        setIsMobile(event.matches);
-      };
-    } else {
-      onChange = () => {
-        setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-      };
-    }
-
-    const mql = window.matchMedia(query);
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+    const onChange = () => {
+      setIsSmallScreen(window.innerWidth < MOBILE_BREAKPOINT);
+    };
     mql.addEventListener("change", onChange);
-
-    onChange(mql as any);
-
+    setIsSmallScreen(window.innerWidth < MOBILE_BREAKPOINT);
     return () => mql.removeEventListener("change", onChange);
-  }, [setIsMobile]);
+  }, []);
 
-  return !!isMobile;
+  useEffect(() => {
+    const mql = window.matchMedia(`(hover: none)`);
+    const onChange = () => {
+      setHasTouch(mql.matches);
+    };
+    mql.addEventListener("change", onChange);
+    setHasTouch(mql.matches);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  if (queryTouch)
+    return {
+      hasTouch,
+      isSmallScreen
+    };
+
+  return isSmallScreen;
 }
+
+export { useIsMobile };
