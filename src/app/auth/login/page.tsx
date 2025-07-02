@@ -26,7 +26,7 @@ import PasswordBlock from "../PasswordBlock";
 import Image from "next/image";
 
 export default function LoginForm() {
-  const { setRenderOnlyHome, setForcedDisable: setDefaultShown } = useNavbar();
+  const { setRenderOnlyHome, setDefaultShown } = useNavbar();
 
   const router = useRouter();
 
@@ -114,7 +114,7 @@ export default function LoginForm() {
     }
 
     toast.dismiss();
-    const loader = toast.loading("Creating Account ...");
+    const loader = toast.loading("Logging In ...");
 
     const state = await loginEmailPass(email, password);
 

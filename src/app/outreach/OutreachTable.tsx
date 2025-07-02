@@ -303,7 +303,7 @@ export function OutreachTable({
                         className={`${getBadgeStatusStyles(
                           userData.outreachMinutes,
                           outreachMinutesCutoff,
-                          60 * 3
+                          outreachMinutesCutoff - 60 * 3
                         )} text-sm`}>
                         {formatMinutes(userData.outreachMinutes)}
                       </Badge>
@@ -424,7 +424,7 @@ export function OutreachTable({
                     className={`${getBadgeStatusStyles(
                       userData.outreachMinutes,
                       outreachMinutesCutoff,
-                      60 * 3
+                      outreachMinutesCutoff - 60 * 3
                     )} text-md`}>
                     {formatMinutes(userData.outreachMinutes)}
                   </Badge>

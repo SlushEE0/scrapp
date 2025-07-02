@@ -202,7 +202,7 @@ export default function OutreachPage({
                     className={`${getBadgeStatusStyles(
                       userData.outreachMinutes,
                       outreachMinutesCutoff,
-                      60 * 3
+                      outreachMinutesCutoff - 60 * 3
                     )} text-sm px-3 py-1`}>
                     {userData.outreachMinutes >= outreachMinutesCutoff
                       ? "Complete"

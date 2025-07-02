@@ -169,7 +169,7 @@ export default function ActivityGraph({ id }: OutreachActivityGraphProps) {
               {data.month} {data.year}
             </p>
             <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-primary">{data.events}</span>{" "}
+              <span className="font-medium text-primary">{data.events}</span>
               {data.events === 1 ? "event" : "events"}
             </p>
           </div>
@@ -183,7 +183,7 @@ export default function ActivityGraph({ id }: OutreachActivityGraphProps) {
     <div className="size-full flex flex-col bg-transparent">
       <div className="mb-4">
         <h3 className="text-sm font-medium mb-1">Activity Timeline</h3>
-      </div>{" "}
+      </div>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={activityData}>
           <Tooltip content={<CustomTooltip />} />
