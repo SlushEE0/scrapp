@@ -41,13 +41,7 @@ export async function loginOAuth_Discord() {
 }
 
 async function storeServerCookie() {
-  setPocketbaseCookie(
-    pb.authStore.exportToCookie({
-      secure: false,
-      httpOnly: false,
-      sameSite: "lax"
-    })
-  );
+  setPocketbaseCookie(pb.authStore.exportToCookie());
 }
 
 export function logout() {

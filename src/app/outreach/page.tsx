@@ -15,12 +15,12 @@ export default async function ServerDataFetcher() {
       try {
         data = await pb
           .collection("UserData")
-          .getFirstListItem<t_pb_UserData>(`user="${authRecord?.id}"`, {
+          .getFirstListItem<t_pb_UserData>(`user='${authRecord.id}'`, {
             expand: "user"
           });
         const record = await pb
           .collection("Settings")
-          .getFirstListItem("key='outreachMinutesCutoff'");
+          .getFirstListItem("key='OutreachMinsCutoff'");
 
         outreachMinutesCutoff = parseInt(record.value) || 900;
       } catch (e) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, Suspense } from "react";
 import useSWRInfinite from "swr/infinite";
 
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
@@ -11,13 +11,18 @@ import type { t_pb_UserData } from "@/lib/types";
 
 import { formatMinutes, getBadgeStatusStyles } from "@/lib/utils";
 
-import { Users, Clock } from "lucide-react";
+import { Users, Clock, TrendingUp, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { OutreachTable } from "./OutreachTable";
+import Loading from "./loading";
 import Loader from "@/components/Loader";
+import ActivityGraph from "./ActivityGraph";
+
+// Import the activity graph component
+// import OutreachActivityGraph from "./OutreachActivityGraph";
 
 const PAGE_SIZE = 15;
 
@@ -95,7 +100,17 @@ export default function OutreachPage({
     loadMore();
   });
 
-  if (!isHydrated) return <Loader />;
+  useEffect(() => {
+    if (isHydrated && !hasMore && !isLoadingMore) {
+    }
+  });
+
+  if (!isHydrated)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
 
   if (error) {
     console.error("Error loading outreach data:", error);
@@ -112,18 +127,18 @@ export default function OutreachPage({
       </div>
     );
   }
+
   return (
     <div
       className={`container mx-auto h-screen flex flex-col ${
-        isMobile ? "pt-2 px-4 pb-20" : "pt-3"
+        isMobile ? "pt-4 px-4 pb-20" : "pt-3"
       }`}>
       {/* Header */}
       <div className="flex-shrink-0 mb-4">
-        {" "}
         <div className="flex items-center gap-2 mb-2">
           <Users className={`${isMobile ? "h-5 w-5" : "h-6 w-6"}`} />
           <h1 className={`${isMobile ? "text-2xl" : "text-3xl"} font-bold`}>
-            {isMobile ? "Outreach" : "Outreach Dashboard"}
+            Outreach Dashboard
           </h1>
         </div>
         <p className="text-muted-foreground text-sm">
@@ -132,70 +147,137 @@ export default function OutreachPage({
             : "View outreach data"}
         </p>
       </div>
-      {/* Stats Cards */}{" "}
+
+      {/* Stats Cards */}
       <div
         className={`${
           isMobile ? "flex flex-col gap-3" : "flex gap-4"
         } mb-4 flex-shrink-0`}>
-        <Card className={`${isMobile ? "w-full" : "w-80"} px-2`}>
-          <CardHeader>
-            <section className="flex gap-3">
-              <Avatar className="h-11 w-11 flex-shrink-0">
-                <AvatarImage
-                  src={recordToImageUrl(userData?.expand?.user)?.toString()}
-                  alt={userData?.expand?.user.name}
-                  className="rounded-full"
-                />
-                <AvatarFallback className="bg-muted text-muted-foreground text-xs rounded-full flex items-center justify-center h-full w-full">
-                  {userData?.expand?.user.name.charAt(0) || "?"}
-                </AvatarFallback>
-              </Avatar>
+        {/* Enhanced User Hours Card */}
+        <Card className={`${isMobile ? "w-full" : "w-80"}`}>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Avatar className="h-12 w-12 flex-shrink-0">
+                  <AvatarImage
+                    src={recordToImageUrl(userData?.expand?.user)?.toString()}
+                    alt={userData?.expand?.user.name}
+                    className="rounded-full object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold rounded-full flex items-center justify-center h-full w-full">
+                    {userData?.expand?.user.name?.charAt(0).toUpperCase() ||
+                      "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium truncate">
+                <h3 className="font-semibold text-lg truncate">
                   {userData?.expand?.user.name || "Unknown User"}
-                </p>
+                </h3>
                 <p className="text-sm text-muted-foreground truncate">
                   {userData?.expand?.user.email || "No email"}
                 </p>
               </div>
-            </section>
+            </div>
           </CardHeader>
           <CardContent className="pt-0">
-            {userData?.outreachMinutes && (
-              <div className="flex gap-2">
-                <span className={`${isMobile ? "text-lg" : "text-2xl"}`}>
-                  You Have:
-                </span>
-                <Badge
-                  className={`${getBadgeStatusStyles(
-                    userData.outreachMinutes,
-                    outreachMinutesCutoff,
-                    60 * 3
-                  )} ${isMobile ? "text-lg" : "text-2xl"} w-fit`}>
-                  {formatMinutes(userData.outreachMinutes)}
-                </Badge>
+            {userData?.outreachMinutes ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    Your Progress
+                  </span>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <div className="text-3xl font-bold">
+                      {formatMinutes(userData.outreachMinutes)}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Total completed
+                    </div>
+                  </div>
+                  <Badge
+                    className={`${getBadgeStatusStyles(
+                      userData.outreachMinutes,
+                      outreachMinutesCutoff,
+                      60 * 3
+                    )} text-sm px-3 py-1`}>
+                    {userData.outreachMinutes >= outreachMinutesCutoff
+                      ? "Complete"
+                      : "In Progress"}
+                  </Badge>
+                </div>
+
+                {/* Progress bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Progress</span>
+                    <span>
+                      {Math.round(
+                        (userData.outreachMinutes / outreachMinutesCutoff) * 100
+                      )}
+                      %
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (userData.outreachMinutes / outreachMinutesCutoff) *
+                            100
+                        )}%`
+                      }}></div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {userData.outreachMinutes < outreachMinutesCutoff && (
+                      <>
+                        {formatMinutes(
+                          outreachMinutesCutoff - userData.outreachMinutes
+                        )}{" "}
+                        remaining
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <Clock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No outreach data yet
+                </p>
               </div>
             )}
           </CardContent>
-        </Card>{" "}
+        </Card>
+
+        {/* Activity Graph Card - Replaces the Loader */}
         {!isMobile && (
           <Card className="grow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Outreach Hours
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Activity Overview
               </CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className={"text-2xl font-bold"}>5 h</div>
-            </CardContent>{" "}
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>{" "}
+            <CardContent className="pt-2 size-full flex justify-center items-center">
+              <Suspense fallback={<Loader />}>
+                <ActivityGraph timestamps={fakeTimestamps} />
+              </Suspense>
+            </CardContent>
           </Card>
         )}
       </div>
+
       <Separator className="w-full mb-5" />
+
       {/* Table Container - Takes remaining space */}
       <div className="flex-1 min-h-0">
-        {" "}
         <OutreachTable
           allUsers={allUsers}
           isAdmin={isAdmin}

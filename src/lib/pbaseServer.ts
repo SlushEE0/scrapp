@@ -14,10 +14,8 @@ export async function runPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
 
   const authData = await getPocketbaseCookie();
 
-  console.log("authdata", authData);
-
   pbServer.authStore.loadFromCookie(authData);
-  pbServer.collection("users").authRefresh();
+  // pbServer.collection("users").authRefresh();
 
   const ret = fn(pbServer);
 
@@ -29,7 +27,10 @@ export async function runPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
 export async function setPocketbaseCookie(value: string) {
   const cookieStore = await cookies();
   cookieStore.set("pb_auth", value, {
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+    secure: false,
+    httpOnly: false,
+    sameSite: "lax"
   });
 }
 

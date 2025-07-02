@@ -12,19 +12,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const authStore = await runPocketbase((pb) => {
-    return pb.authStore;
+  const record = await runPocketbase((pb) => {
+    return pb.authStore.record;
   });
 
-  if (!authStore) {
+  if (!record) {
     nextUrl.pathname = "/auth/login";
 
     return NextResponse.redirect(nextUrl);
   }
 
-  const role = authStore?.record?.role || "guest";
+  const role = record?.role || "guest";
 
-  if (role === "huhu") {
+  if (role === "admin") {
     return NextResponse.next();
   }
 
