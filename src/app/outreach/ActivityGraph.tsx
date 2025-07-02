@@ -180,19 +180,29 @@ export default function ActivityGraph({ id }: OutreachActivityGraphProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="size-full flex flex-col bg-transparent">
       <div className="mb-4">
         <h3 className="text-sm font-medium mb-1">Activity Timeline</h3>
       </div>{" "}
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={activityData}>
           <Tooltip content={<CustomTooltip />} />
+          <defs>
+            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+            </linearGradient>
+          </defs>
           <Area
             type="monotone"
             dataKey="events"
             stroke="var(--primary)"
             strokeWidth={2}
-            fill="linear-gradient(to bottom, var(--primary) 5%, transparent 95%)"
+            fill="transparent"
             activeDot={{ r: 2, stroke: "var(--primary)" }}
           />
         </AreaChart>
