@@ -188,12 +188,14 @@ export default function ActivityGraph({ id }: OutreachActivityGraphProps) {
         <AreaChart data={activityData}>
           <Tooltip content={<CustomTooltip />} />
           <Area
-            type="monotone"
+            type="linear"
             dataKey="events"
             stroke="var(--primary)"
             strokeWidth={2}
             fill="transparent"
-            activeDot={{ r: 2, stroke: "var(--primary)" }}
+            dot={{ r: 2, stroke: "var(--primary)" }}
+            activeDot={{ r: 3, stroke: "var(--primary)" }}
+            className="transition-all duration-300 ease-in-out"
           />
         </AreaChart>
       </ResponsiveContainer>

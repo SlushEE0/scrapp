@@ -3,14 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { runPocketbase } from "./lib/pbaseServer";
 
 const adminPaths = ["/admin", "/testing"];
-const publicPaths = ["/auth/unauthorized", "/auth/login", "/auth/signup"];
+const authenticatedPaths = [
+  "/dashboard",
+  "/profile",
+  "/settings",
+  "/outreach",
+  "/build"
+];
+// const publicPaths = ["/auth/unauthorized", "/auth/login", "/auth/signup"];
 
 export async function middleware(request: NextRequest) {
   const nextUrl = request.nextUrl.clone();
 
-  if (publicPaths.includes(nextUrl.pathname)) {
+  // if (publicPaths.includes(nextUrl.pathname)) {
+  //   return NextResponse.next();
+  // }
+
+  if (![...authenticatedPaths, ...adminPaths].includes(nextUrl.pathname))
     return NextResponse.next();
-  }
 
   const record = await runPocketbase((pb) => {
     return pb.authStore.record;
@@ -18,7 +28,6 @@ export async function middleware(request: NextRequest) {
 
   if (!record) {
     nextUrl.pathname = "/auth/login";
-
     return NextResponse.redirect(nextUrl);
   }
 

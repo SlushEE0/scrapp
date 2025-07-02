@@ -157,14 +157,14 @@ export default function OutreachPage({
         <Card className={`${isMobile ? "w-full" : "w-80"}`}>
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <div className="relative">
+              <div className="relative flex items-center justify-center">
                 <Avatar className="h-12 w-12 flex-shrink-0">
                   <AvatarImage
                     src={recordToImageUrl(userData?.expand?.user)?.toString()}
                     alt={userData?.expand?.user.name}
                     className="rounded-full object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold rounded-full flex items-center justify-center h-full w-full">
+                  <AvatarFallback className="bg-gradient-to-br from-blue-800 to-purple-800 text-white text-sm font-semibold rounded-full flex items-center justify-center h-full w-full">
                     {userData?.expand?.user.name?.charAt(0).toUpperCase() ||
                       "?"}
                   </AvatarFallback>
@@ -221,7 +221,7 @@ export default function OutreachPage({
                       %
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
                       style={{
