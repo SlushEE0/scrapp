@@ -26,6 +26,7 @@ import {
   loginOAuth_Google
 } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
+import SkeletonLoginForm from "./SkeletonLoginForm";
 
 export default function LoginForm() {
   const { setRenderOnlyHome, setDefaultShown } = useNavbar();
@@ -254,7 +255,7 @@ export default function LoginForm() {
                     </Button>
                   </div>
                 ) : (
-                  <Loader />
+                  <SkeletonLoginForm />
                 )}
                 <div className="text-center text-sm text-muted-foreground">
                   Don&apos;t have an account?{" "}
