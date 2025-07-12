@@ -1,12 +1,8 @@
-# Features
-- Build Page
-- Reset Password
-- Log Hours
+# Main
+- Split pocketbase to separate app
 
 # Styling
-- Avatar Randomized Gradient (account linked?) <- Make with picture upload
 
 # Misc
-- Make Outreach Graph Bi-Weekly
 
 # Bugs

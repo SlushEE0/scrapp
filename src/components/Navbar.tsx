@@ -24,7 +24,7 @@ const allItems = [
     onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
     label: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     msg: "Going to your Dashboard"
   },
   {
