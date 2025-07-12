@@ -1,0 +1,7 @@
+/pocketbase/*
+!/pocketbase/pb_migrations
+/node_modules
+/.next
+/.vscode
+/.github
+/src/app/testing

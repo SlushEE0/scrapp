@@ -2,8 +2,8 @@
 
 /src/app/testing
 
-/pocketbase/pb_data
-/pocketbase/pb_migrations
+/pocketbase/*
+!/pocketbase/pb_migrations
 
 # dependencies
 /node_modules
