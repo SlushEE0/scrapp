@@ -1,5 +1,4 @@
-/pocketbase/*
-!/pocketbase/pb_migrations
+/BlazeGuard-PB
 /node_modules
 /.next
 /.vscode

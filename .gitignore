@@ -2,8 +2,7 @@
 
 /src/app/testing
 
-/pocketbase/*
-!/pocketbase/pb_migrations
+/BlazeGuard-PB
 
 # dependencies
 /node_modules
