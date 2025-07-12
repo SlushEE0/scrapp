@@ -16,11 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useNavbar } from "@/hooks/useNavbar";
-import {
-  loginEmailPass,
-  loginOAuth_Discord,
-  loginOAuth_Google
-} from "@/lib/auth";
+import { loginEmailPass, loginOAuth_Discord, loginOAuth } from "@/lib/auth";
 import { newUser } from "@/lib/db/user";
 import { BaseStates } from "@/lib/states";
 import { useRouter } from "next/navigation";
@@ -39,7 +35,7 @@ export default function LoginForm() {
   });
 
   const handleGoogleOAuth = function () {
-    loginOAuth_Google();
+    loginOAuth();
   };
 
   const handleDiscordOAuth = function () {

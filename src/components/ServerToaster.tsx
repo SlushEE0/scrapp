@@ -7,19 +7,23 @@ type Props = {
   message: string;
   type?: "success" | "error" | "info";
   duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
 export default function ServerToaster({
   message,
   type = "info",
-  duration
+  duration,
+  action
 }: Props) {
   useEffect(() => {
-    setTimeout(() => {
-      toast[type](message, {
-        duration
-      });
-    }, 50);
+    toast[type](message, {
+      duration,
+      action
+    });
   }, [message, type, duration]);
 
   return <div className="absolute -top-20 -left-20 w-0 h-0 -z-10"></div>;

@@ -20,11 +20,7 @@ import PasswordBlock from "../PasswordBlock";
 
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { useNavbar } from "@/hooks/useNavbar";
-import {
-  loginEmailPass,
-  loginOAuth_Discord,
-  loginOAuth_Google
-} from "@/lib/auth";
+import { loginEmailPass, loginOAuth } from "@/lib/auth";
 import { BaseStates } from "@/lib/states";
 import SkeletonLoginForm from "./SkeletonLoginForm";
 
@@ -44,13 +40,14 @@ export default function LoginForm() {
 
     setTimeout(() => {
       router.push("/");
-    }, 500);
+      toast.dismiss();
+    }, 300);
   }, [router]);
 
   const handleGoogleOAuth = async function () {
     const loader = toast.loading("Continue on the popup ...");
 
-    const state = await loginOAuth_Google();
+    const state = await loginOAuth("google");
 
     toast.dismiss(loader);
 
@@ -67,22 +64,22 @@ export default function LoginForm() {
   };
 
   const handleDiscordOAuth = async function () {
-    const loader = toast.loading("Continue on the popup ...");
+    const loader = toast.error("Not implemented yet :(");
 
-    const state = await loginOAuth_Discord();
+    // const state = await loginOAuth("discord");
 
-    toast.dismiss(loader);
+    // toast.dismiss(loader);
 
-    switch (state) {
-      case BaseStates.SUCCESS:
-        toast.success("Login successful!");
-        redirectToHome();
-        break;
-      case BaseStates.ERROR:
-      default:
-        toast.error("Something went wrong :(");
-        break;
-    }
+    // switch (state) {
+    //   case BaseStates.SUCCESS:
+    //     toast.success("Login successful!");
+    //     redirectToHome();
+    //     break;
+    //   case BaseStates.ERROR:
+    //   default:
+    //     toast.error("Something went wrong :(");
+    //     break;
+    // }
   };
 
   const handleSubmit = useCallback(async () => {

@@ -12,7 +12,7 @@ import { recordToImageUrl } from "@/lib/pbaseClient";
 import { logout } from "@/lib/auth";
 import type { t_pb_User } from "@/lib/types";
 
-import { User, FileSpreadsheet, Clock, Signature } from "lucide-react";
+import { User, Clock, Signature, MessageSquareQuote } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import NavbarSkeleton from "./skeletons/NavbarSkeleton";
@@ -23,26 +23,20 @@ const allItems = [
   {
     onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
-    label: "Home",
+    label: "Dashboard",
     url: "/",
-    msg: "Going Home"
+    msg: "Going to your Dashboard"
   },
   {
-    icon: <FileSpreadsheet className="h-5 w-5" />,
-    label: "Budget",
-    url: "/budget",
-    msg: "Going to the Budget Sheet"
-  },
-  {
-    icon: <Clock className="h-5 w-5" />,
-    label: "Outreach",
-    url: "/outreach",
-    msg: "Going to the Outreach Sheet"
+    icon: <MessageSquareQuote className="h-5 w-5" />,
+    label: "Chat",
+    url: "/chat",
+    msg: "Taking you to the chatbot"
   },
   {
     onlyHomePersist: true,
     icon: <Signature className="h-5 w-5" />,
-    label: "Sign Out",
+    label: "(testing only) Sign Out",
     url: "/",
     msg: "Signing Out",
     func: () => {
@@ -261,9 +255,9 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                     <span className="text-sm font-medium text-foreground underline transition-all duration-200 ease-in-out decoration-transparent group-hover:decoration-current">
                       {user.name}
                     </span>
-                    <span className="text-sm font-sm text-muted-foreground">
+                    {/* <span className="text-sm font-sm text-muted-foreground">
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </span>
+                    </span> */}
                   </div>
                   <Avatar className="h-8 w-8">
                     <AvatarImage

@@ -26,3 +26,5 @@ export interface t_pb_UserData extends RecordModel {
     user: t_pb_User;
   };
 }
+
+export type OAuthProvider = "google" | "discord";

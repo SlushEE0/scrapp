@@ -5,12 +5,17 @@ import "server-only";
 import { cookies } from "next/headers";
 import PocketBase, { BaseAuthStore } from "pocketbase";
 
+const POCKETBASE_URL = process.env.NEXT_PUBLIC_PB_URL || "";
+
+if (!POCKETBASE_URL) {
+  throw new Error(
+    "POCKETBASE_URL is not defined. Please set the NEXT_PUBLIC_PB_URL environment variable."
+  );
+}
+
 export async function runPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
   const ramAuthStore = new BaseAuthStore();
-  const pbServer = new PocketBase(
-    process.env.NEXT_PUBLIC_PB_URL || "",
-    ramAuthStore
-  );
+  const pbServer = new PocketBase(POCKETBASE_URL, ramAuthStore);
 
   const authData = await getPocketbaseCookie();
 
