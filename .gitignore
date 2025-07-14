@@ -1,7 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-/pocketbase/pb_data
-/pocketbase/pb_migrations
+/src/app/testing
 
 # dependencies
 /node_modules
@@ -34,7 +33,10 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
+# .env*
+
 .env*
+*/.env*
 
 # vercel
 .vercel

@@ -20,20 +20,8 @@ export async function loginEmailPass(
   }
 }
 
-export async function loginOAuth_Google() {
-  const authData = await pb
-    .collection("users")
-    .authWithOAuth2({ provider: "google" });
-
-  storeServerCookie();
-  if (authData.token) return BaseStates.SUCCESS;
-  else return BaseStates.ERROR;
-}
-
-export async function loginOAuth_Discord() {
-  const authData = await pb
-    .collection("users")
-    .authWithOAuth2({ provider: "discord" });
+export async function loginOAuth(provider: OAuthProvider) {
+  const authData = await pb.collection("users").authWithOAuth2({ provider });
 
   storeServerCookie();
   if (authData.token) return BaseStates.SUCCESS;
