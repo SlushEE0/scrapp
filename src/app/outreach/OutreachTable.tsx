@@ -14,21 +14,12 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EditUserDialog from "./EditUserDialog";
 
 type OutreachTableProps = {
   allUsers: t_pb_UserData[];
@@ -38,82 +29,8 @@ type OutreachTableProps = {
   onUpdate: () => void;
   outreachMinutesCutoff: number;
   isMobile?: boolean;
+  refetchData?: () => void; // Function to refetch data after edits
 };
-
-function EditUserDialog({ userData }: { userData: t_pb_UserData }) {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    outreachMinutes: userData.outreachMinutes,
-    lastOutreachEvent: userData.lastOutreachEvent
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      await pb.collection("userData").update(userData.id, formData);
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to update user data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <Edit2 className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit User Data</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="outreachMinutes">Outreach Minutes</Label>
-            <Input
-              id="outreachMinutes"
-              type="number"
-              value={formData.outreachMinutes}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  outreachMinutes: parseInt(e.target.value) || 0
-                })
-              }
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lastOutreachEvent">Last Outreach Event</Label>
-            <Input
-              id="lastOutreachEvent"
-              value={formData.lastOutreachEvent}
-              onChange={(e) =>
-                setFormData({ ...formData, lastOutreachEvent: e.target.value })
-              }
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Updating..." : "Update"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
 
 const SortedTableHeads = [
   {
@@ -150,7 +67,8 @@ export function OutreachTable({
   isLoading,
   isLoadingMore,
   outreachMinutesCutoff,
-  isMobile = false
+  isMobile = false,
+  refetchData
 }: OutreachTableProps) {
   const [sortedUsers, setSortedUsers] = useState(allUsers);
 
@@ -434,7 +352,10 @@ export function OutreachTable({
                 </TableCell>
                 {isAdmin && (
                   <TableCell>
-                    <EditUserDialog userData={userData} />
+                    <EditUserDialog
+                      userData={userData}
+                      refreshFunc={refetchData}
+                    />
                   </TableCell>
                 )}
               </TableRow>

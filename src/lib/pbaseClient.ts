@@ -12,8 +12,6 @@ if (!POCKETBASE_URL) {
 export const pb = new PocketBase(POCKETBASE_URL);
 
 export function recordToImageUrl(record?: t_pb_User) {
-  console.log("recordToImageUrl", record);
-
   if (!record || !record.id) return null;
 
   const fileUrl = new URL(

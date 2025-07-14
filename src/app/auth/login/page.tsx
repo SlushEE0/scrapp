@@ -66,7 +66,7 @@ export default function LoginForm() {
   };
 
   const handleDiscordOAuth = async function () {
-    // const loader = toast.error("Not implemented yet :(");
+    const loader = toast.loading("Continue on the popup ...");
 
     const state = await loginOAuth("discord");
 

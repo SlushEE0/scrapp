@@ -2,6 +2,8 @@ import { pb } from "./pbaseClient";
 import { BaseStates } from "./states";
 import { setPocketbaseCookie } from "./pbaseServer";
 
+import { OAuthProvider } from "./types";
+
 export async function loginEmailPass(
   email: string,
   password: string

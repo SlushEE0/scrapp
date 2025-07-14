@@ -20,6 +20,7 @@ import { OutreachTable } from "./OutreachTable";
 import Loading from "./loading";
 import Loader from "@/components/Loader";
 import ActivityGraph from "./ActivityGraph";
+import { Button } from "@/components/ui/button";
 
 // Import the activity graph component
 // import OutreachActivityGraph from "./OutreachActivityGraph";
@@ -92,6 +93,10 @@ export default function OutreachPage({
     mutate();
   }, [mutate]);
 
+  const refetchData = useCallback(() => {
+    mutate();
+  }, [mutate]);
+
   useEffect(() => {
     setDefaultShown(false);
   }, [setDefaultShown]);
@@ -134,18 +139,22 @@ export default function OutreachPage({
         isMobile ? "pt-4 px-4 pb-20" : "pt-3"
       }`}>
       {/* Header */}
-      <div className="flex-shrink-0 mb-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Users className={`${isMobile ? "h-5 w-5" : "h-6 w-6"}`} />
-          <h1 className={`${isMobile ? "text-2xl" : "text-3xl"} font-bold`}>
-            Outreach Dashboard
-          </h1>
+      <div className="flex-shrink-0 mb-4 justify-between flex items-center">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Users className={`${isMobile ? "h-5 w-5" : "h-6 w-6"}`} />
+            <h1 className={`${isMobile ? "text-2xl" : "text-3xl"} font-bold`}>
+              Outreach Dashboard
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            {isAdmin
+              ? "Manage and view user outreach data"
+              : "View outreach data"}
+          </p>
         </div>
-        <p className="text-muted-foreground text-sm">
-          {isAdmin
-            ? "Manage and view user outreach data"
-            : "View outreach data"}
-        </p>
+
+        {isAdmin && <Button variant="outline">Manage Events</Button>}
       </div>
 
       {/* Stats Cards */}
@@ -286,6 +295,7 @@ export default function OutreachPage({
           onUpdate={handleUpdate}
           outreachMinutesCutoff={outreachMinutesCutoff}
           isMobile={isMobile}
+          refetchData={refetchData}
         />
       </div>
     </div>
