@@ -44,7 +44,7 @@ const SortedTableHeads = [
   },
   {
     key: "outreachMinutes",
-    name: "Outreach Time",
+    name: "Logged Time",
     ascending: "Low > High",
     descending: "High > Low",
     noSort: "",
@@ -151,7 +151,7 @@ export function OutreachTable({
                       : "ascending"
                 }));
               }}>
-              Time{" "}
+              Hours{" "}
               {sortConfig.key === "outreachMinutes" &&
                 (sortConfig.direction === "ascending" ? "↑" : "↓")}
             </Button>
@@ -171,7 +171,7 @@ export function OutreachTable({
                       : "ascending"
                 }));
               }}>
-              Date{" "}
+              Event Date{" "}
               {sortConfig.key === "lastOutreachEvent" &&
                 (sortConfig.direction === "ascending" ? "↑" : "↓")}
             </Button>

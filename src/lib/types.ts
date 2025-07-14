@@ -27,4 +27,23 @@ export interface t_pb_UserData extends RecordModel {
   };
 }
 
+export interface t_pb_OutreachEvent extends RecordModel {
+  id: string;
+  name: string;
+  created: string;
+  updated: string;
+  date: string;
+}
+
+export interface t_pb_OutreachSession extends RecordModel {
+  id: string;
+  user: string;
+  minutes: number;
+  created: string;
+  expand?: {
+    user: t_pb_User;
+    event: t_pb_OutreachEvent;
+  };
+}
+
 export type OAuthProvider = "google" | "discord";

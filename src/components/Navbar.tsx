@@ -76,7 +76,7 @@ export default function Navbar({}) {
 
   const { user } = useUser();
 
-  if (!isHydrated) return <NavbarSkeleton navItems={allItems} />;
+  if (!isHydrated) return null; //<NavbarSkeleton navItems={allItems} />;
 
   const navItems = state.renderOnlyHome
     ? allItems.filter((item) => item.onlyHomePersist)

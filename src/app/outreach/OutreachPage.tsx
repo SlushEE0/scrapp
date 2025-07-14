@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, Suspense } from "react";
 import useSWRInfinite from "swr/infinite";
+import Link from "next/link";
 
 import { pb, recordToImageUrl } from "@/lib/pbaseClient";
 import { useNavbar } from "@/hooks/useNavbar";
@@ -154,7 +155,11 @@ export default function OutreachPage({
           </p>
         </div>
 
-        {isAdmin && <Button variant="outline">Manage Events</Button>}
+        {isAdmin && (
+          <Button variant="outline" asChild>
+            <Link href="/outreach/manage-events">Manage Events</Link>
+          </Button>
+        )}
       </div>
 
       {/* Stats Cards */}

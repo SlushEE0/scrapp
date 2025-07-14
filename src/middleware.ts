@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { runPocketbase } from "./lib/pbaseServer";
 
-const adminOnlyRoutes = ["/admin", "/testing"];
+const adminOnlyRoutes = ["/admin", "/testing", "/outreach/manage-events"];
 const authedOnlyRoutes = [
   "/dashboard",
   "/profile",
