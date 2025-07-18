@@ -53,7 +53,7 @@ export default function EventsList({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className={isMobile ? "h-[300px]" : "h-[500px]"}>
+        <ScrollArea className="h-full">
           {!events ? (
             <div className="flex items-center justify-center py-8">
               <Loader />

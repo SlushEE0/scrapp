@@ -19,16 +19,14 @@ export default function EventDetails({
   onSessionDeleted
 }: EventDetailsProps) {
   return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Event Details
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+    <div className="flex flex-col h-screen bg-card rounded-xl text-card-foreground gap-6 border py-6">
+      <div className="flex gap-2 px-5">
+        <Users className="h-5 w-5" />
+        <strong>Event Details</strong>
+      </div>
+      <div className="flex-1 flex flex-col p-5 h-full">
         {selectedEvent ? (
-          <div className="space-y-6 flex flex-col flex-1">
+          <div className="space-y-6 pb-5 flex flex-col flex-1 h-full">
             <div>
               <h3 className="text-lg font-semibold mb-2">
                 {selectedEvent.name}
@@ -52,7 +50,7 @@ export default function EventDetails({
 
             <Separator />
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center ">
               <LogHoursDialog
                 event={selectedEvent}
                 onHoursLogged={onHoursLogged}
@@ -73,7 +71,7 @@ export default function EventDetails({
             <p>Select an event to view details</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

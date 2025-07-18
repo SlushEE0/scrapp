@@ -128,10 +128,8 @@ export default function ManageEventsPage() {
       </div>
 
       <div
-        className={`h-full ${
-          isMobile
-            ? "pb-20 grid flex-1 space-y-4"
-            : "flex-1 grid lg:grid-cols-2 gap-5"
+        className={`grid lg:grid-cols-2 gap-5 ${
+          isMobile ? "grid-cols-1 pb-20" : ""
         }`}>
         <EventsList
           events={events}

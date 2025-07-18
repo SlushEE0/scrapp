@@ -56,9 +56,9 @@ export default function EventSessionsTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-3 h-full overflow-scroll">
       <h4 className="font-semibold">Logged Hours</h4>
-      <div className="max-h-[400px] overflow-y-auto border rounded-md">
+      <div className="overflow-y-auto border rounded-md overflow-scroll">
         <Table>
           <TableHeader>
             <TableRow>
