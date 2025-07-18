@@ -1,7 +1,9 @@
 # Features
 - Build Page
 - Reset Password
-- Log Hours
+
+# TESTING
+- HOURS LOGGING
 
 # Styling
 - Avatar Randomized Gradient (account linked?) <- Make with picture upload

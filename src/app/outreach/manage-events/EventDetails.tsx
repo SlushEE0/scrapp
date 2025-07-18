@@ -19,7 +19,7 @@ export default function EventDetails({
   onSessionDeleted
 }: EventDetailsProps) {
   return (
-    <div className="flex flex-col h-screen bg-card rounded-xl text-card-foreground gap-6 border py-6">
+    <div className="flex flex-col h-[calc(100vh-130px)] bg-card rounded-xl text-card-foreground gap-6 border py-6">
       <div className="flex gap-2 px-5">
         <Users className="h-5 w-5" />
         <strong>Event Details</strong>

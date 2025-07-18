@@ -105,12 +105,9 @@ export default function ManageEventsPage() {
   }
 
   return (
-    <div
-      className={`h-screen p-5 flex flex-col ${
-        isMobile ? "pt-4 px-4 pb-20" : "pt-3"
-      }`}>
+    <div className={`p-4 flex flex-col`}>
       {/* Header */}
-      <div className="flex-shrink-0 mb-6">
+      <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -129,7 +126,7 @@ export default function ManageEventsPage() {
 
       <div
         className={`grid lg:grid-cols-2 gap-5 ${
-          isMobile ? "grid-cols-1 pb-20" : ""
+          isMobile ? "grid-cols-1 mb-20" : ""
         }`}>
         <EventsList
           events={events}
