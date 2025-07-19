@@ -1,9 +1,12 @@
 # Features
-- Build Page
-- Reset Password
+- Pages
+- - Reset Password
+- - Builds whole shennanigans
 
 # TESTING
-- HOURS LOGGING
+- Outreach
+- - Whole flow
+- - hours logging
 
 # Styling
 - Avatar Randomized Gradient (account linked?) <- Make with picture upload

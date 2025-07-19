@@ -157,7 +157,7 @@ export default function OutreachPage({
 
         {isAdmin && (
           <Button variant="outline" asChild>
-            <Link href="/outreach/manage-events">Manage Events</Link>
+            <Link href="/outreach/manage">Manage Events</Link>
           </Button>
         )}
       </div>
