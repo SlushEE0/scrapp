@@ -21,7 +21,7 @@ import PasswordBlock from "../PasswordBlock";
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 import { useNavbar } from "@/hooks/useNavbar";
 import { loginEmailPass, loginOAuth } from "@/lib/auth";
-import { BaseStates } from "@/lib/states";
+import { BaseStates, SimpleLoginStates } from "@/lib/states";
 import SkeletonLoginForm from "./SkeletonLoginForm";
 
 export default function LoginForm() {
@@ -84,66 +84,74 @@ export default function LoginForm() {
     }
   };
 
-  const handleSubmit = useCallback(async () => {
-    let { email, password } = loginData;
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    console.log("Form submitted with:", { email, password });
+      const formData = new FormData(e.currentTarget);
+      let email = formData.get("email")?.toString();
+      let password = formData.get("password")?.toString();
 
-    if (!email || !password) {
-      toast.error("Email and password are required.");
-      return;
-    }
+      console.log("Form submitted with:", { email, password });
 
-    email = email.trim();
+      if (!email || !password) {
+        toast.error("Email and password are required.");
+        return;
+      }
 
-    setLoginData({
-      email,
-      password
-    });
+      setLoginData({
+        email,
+        password
+      });
 
-    const validateEmail = (email: string) => {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    };
+      toast.dismiss();
+      const loader = toast.loading("Logging In ...");
 
-    if (!validateEmail(email)) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
+      let state = SimpleLoginStates.ERR_UNKNOWN;
+      state = await loginEmailPass(email, password);
 
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long.");
-      return;
-    }
+      toast.dismiss(loader);
 
-    toast.dismiss();
-    const loader = toast.loading("Logging In ...");
-
-    const state = await loginEmailPass(email, password);
-
-    toast.dismiss(loader);
-
-    switch (state) {
-      case BaseStates.SUCCESS:
-        toast.success("Login successful!");
-        redirectToHome();
-        break;
-      case BaseStates.ERROR:
-      default:
-        toast.error("Email or password is incorrect.");
-        break;
-    }
-  }, [loginData, redirectToHome]);
+      switch (state) {
+        case SimpleLoginStates.SUCCESS:
+          toast.success("Login successful!");
+          redirectToHome();
+          break;
+        case SimpleLoginStates.ERR_EMAIL_NOT_PROVIDED:
+          toast.error("Email is required.");
+          break;
+        case SimpleLoginStates.ERR_PASSWORD_NOT_PROVIDED:
+          toast.error("Password is required.");
+          break;
+        case SimpleLoginStates.ERR_INVALID_EMAIL:
+          toast.error("Please enter a valid email address.");
+          break;
+        case SimpleLoginStates.ERR_PASSWORD_TOO_SHORT:
+          toast.error("Password must be at least 8 characters long.");
+          break;
+        case SimpleLoginStates.ERR_EMAIL_NOT_FOUND:
+          toast.error("Email not found. Please check your email.");
+          break;
+        case SimpleLoginStates.ERR_INCORRECT_PASSWORD:
+          toast.error("Incorrect password. Please try again.");
+          break;
+        case SimpleLoginStates.ERR_USER_USES_OAUTH:
+          toast.error(
+            "Hmm... It looks like you signed up using OAuth. Please use Google or Discord to login."
+          );
+          break;
+        case SimpleLoginStates.ERR_UNKNOWN:
+        default:
+          toast.error("Something went wrong. Please try again later.");
+          break;
+      }
+    },
+    [loginData, redirectToHome]
+  );
 
   useEffect(() => {
     setRenderOnlyHome(true);
     setDefaultShown(false);
-
-    window.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        handleSubmit();
-      }
-    });
 
     return () => {
       setRenderOnlyHome(false);
@@ -200,23 +208,16 @@ export default function LoginForm() {
                   </span>
                 </div>
                 {isHydrated ? (
-                  <div className="grid gap-6">
+                  <form className="grid gap-6" onSubmit={handleSubmit}>
                     <div className="grid gap-3">
                       <Label htmlFor="email" className="text-foreground">
                         Email
                       </Label>
                       <Input
                         name="email"
-                        type="email"
+                        type="text"
                         placeholder="m@example.com"
                         className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-                        onChange={(e) => {
-                          setLoginData((d) => ({
-                            ...d,
-                            email: e.target.value
-                          }));
-                        }}
-                        value={loginData.email}
                         autoComplete="email"
                       />
                     </div>
@@ -233,26 +234,17 @@ export default function LoginForm() {
                       </div>
                       <PasswordBlock
                         name="password"
-                        type="password"
                         className="bg-input border-border text-foreground"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          setLoginData((d) => ({
-                            ...d,
-                            password: e.target.value
-                          }));
-                        }}
-                        value={loginData.password}
                         autoComplete="current-password"
                         autoCorrect="off"
                       />
                     </div>
                     <Button
                       type="submit"
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                      onClick={handleSubmit}>
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                       Login
                     </Button>
-                  </div>
+                  </form>
                 ) : (
                   <SkeletonLoginForm />
                 )}

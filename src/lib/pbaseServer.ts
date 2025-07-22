@@ -5,7 +5,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import PocketBase, { BaseAuthStore } from "pocketbase";
 
-export async function runPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
+export async function execPocketbase<T>(fn: (pb: PocketBase) => T): Promise<T> {
   const ramAuthStore = new BaseAuthStore();
   const pbServer = new PocketBase(
     process.env.NEXT_PUBLIC_PB_URL || "",

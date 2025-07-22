@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
@@ -12,12 +13,17 @@ import { recordToImageUrl } from "@/lib/pbaseClient";
 import { logout } from "@/lib/auth";
 import type { t_pb_User } from "@/lib/types";
 
-import { User, FileSpreadsheet, Clock, Signature } from "lucide-react";
+import {
+  User,
+  FileSpreadsheet,
+  Clock,
+  Signature,
+  Construction
+} from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import NavbarSkeleton from "./skeletons/NavbarSkeleton";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 
 const allItems = [
   {
@@ -31,7 +37,16 @@ const allItems = [
     icon: <FileSpreadsheet className="h-5 w-5" />,
     label: "Budget",
     url: "/budget",
-    msg: "Going to the Budget Sheet"
+    msg: "Going to the Budget Sheet",
+    func: () => {
+      toast(
+        <div className="flex gap-4">
+          <Construction className="size-4 text-yellow-600" />
+          <span>Under Construction</span>
+        </div>
+      );
+      return false;
+    }
   },
   {
     icon: <Clock className="h-5 w-5" />,
@@ -91,9 +106,10 @@ export default function Navbar({}) {
     msg?: string;
     func?: () => boolean;
   }) {
-    toast(`${msg}`);
+    if (!func()) return;
 
-    if (func()) router.push(url);
+    toast(`${msg}`);
+    router.push(url);
   };
 
   if (state.forcedDisable) return;

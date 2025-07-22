@@ -1,7 +1,7 @@
 "use server";
 
 import { faker } from "@faker-js/faker";
-import { runPocketbase as runPocketbase } from "@/lib/pbaseServer";
+import { execPocketbase as execPocketbase } from "@/lib/pbaseServer";
 
 export async function generateFakeUser() {
   return {
@@ -14,7 +14,7 @@ export async function generateFakeUser() {
 }
 
 export async function populateFakeUsers(count: number) {
-  runPocketbase(async (pb) => {
+  execPocketbase(async (pb) => {
     for (let i = 0; i < count; i++) {
       const user = await generateFakeUser();
 
@@ -53,7 +53,7 @@ export async function populateFakeOutreachSessions(count: number) {
   // - minutes (number)
   // - event (relation to OutreachEvents) (use id "9a6i619u8dqp344" for now)
 
-  runPocketbase(async (pb) => {
+  execPocketbase(async (pb) => {
     const numUsers = (await pb.collection("users").getList(1, 1)).totalItems;
 
     for (let i = 0; i < count; i++) {

@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -14,147 +14,165 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import { useNavbar } from "@/hooks/useNavbar";
-import { loginEmailPass, loginOAuth } from "@/lib/auth";
-import { newUser } from "@/lib/db/user";
-import { BaseStates } from "@/lib/states";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import PasswordBlock from "../PasswordBlock";
 
-export default function LoginForm() {
+import { useIsHydrated } from "@/hooks/useIsHydrated";
+import { useNavbar } from "@/hooks/useNavbar";
+import { loginOAuth, signupEmailPass } from "@/lib/auth";
+import { BaseStates, SignupStates } from "@/lib/states";
+import SkeletonSignupForm from "./SkeletonSignupForm";
+
+export default function SignupForm() {
   const { setRenderOnlyHome, setDefaultShown } = useNavbar();
 
   const router = useRouter();
+  const isHydrated = useIsHydrated();
 
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    password1: "",
-    password2: ""
-  });
+  const redirectToHome = useCallback(() => {
+    console.log("Redirecting ...");
 
-  const handleGoogleOAuth = function () {
-    loginOAuth("google");
-  };
+    router.prefetch("/");
 
-  const handleDiscordOAuth = function () {
-    loginOAuth("discord");
-  };
+    setTimeout(() => {
+      router.push("/");
+      toast.dismiss();
+    }, 300);
+  }, [router]);
 
-  const handleSubmit = useCallback(async () => {
-    let { name, email, password1, password2 } = userData;
+  const handleGoogleOAuth = async function () {
+    const loader = toast.loading("Continue on the popup ...");
 
-    console.log("Form submitted with:", { name, email, password1, password2 });
+    const state = await loginOAuth("google");
 
-    if (!email || !password1 || !password2 || !name) {
-      toast.error("Please fill in all fields.");
-      return;
-    }
-
-    name = name.trim();
-    email = email.trim();
-
-    setUserData((d) => ({
-      ...d,
-      name,
-      email
-    }));
-
-    const validateName = (name: string) => {
-      const re = /[A-Za-z0-9]+$/;
-      return re.test(String(name).toLowerCase());
-    };
-
-    const validateEmail = (email: string) => {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    };
-
-    if (!name) {
-      toast.error("Please enter a display name.");
-    }
-
-    if (name.length < 3) {
-      toast.error("Display name must be at least 3 characters long.");
-    }
-
-    if (!validateName(name)) {
-      toast.error("Display name can only contain letters and numbers.");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-
-    if (password1 !== password2) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-
-    if (password1.length < 8) {
-      toast.error("Password must be at least 8 characters long.");
-      return;
-    }
-
-    toast.dismiss();
-    const loader = toast.loading("Logging in...");
-
-    const state1 = await newUser(email, password1, name);
-
-    if (state1[0]) {
-      toast.dismiss(loader);
-      toast.error(`Error: ${state1[0]}`);
-
-      if (state1[0] === "ALREADY_EXISTS") {
-        toast.info(
-          "Looks like you have an account. Do you want to reset your password instead?",
-          {
-            duration: 10000,
-            action: {
-              label: "Take me there",
-              onClick: () => {
-                router.push("/auth/reset");
-              }
-            }
-          }
-        );
-      }
-      return;
-    }
-
-    const state2 = await loginEmailPass(email, password1);
     toast.dismiss(loader);
 
-    switch (state2) {
+    switch (state) {
       case BaseStates.SUCCESS:
         toast.success("Login successful!");
-        router.push("/");
+        redirectToHome();
         break;
       case BaseStates.ERROR:
       default:
         toast.error("Something went wrong :(");
         break;
     }
-  }, [userData, router, setUserData]);
+  };
+
+  const handleDiscordOAuth = async function () {
+    const loader = toast.loading("Continue on the popup ...");
+
+    const state = await loginOAuth("discord");
+
+    toast.dismiss(loader);
+
+    switch (state) {
+      case BaseStates.SUCCESS:
+        toast.success("Login successful!");
+        redirectToHome();
+        break;
+      case BaseStates.ERROR:
+      default:
+        toast.error("Something went wrong :(");
+        break;
+    }
+  };
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.currentTarget);
+      let name = formData.get("name")?.toString();
+      let email = formData.get("email")?.toString();
+      let password1 = formData.get("password1")?.toString();
+      let password2 = formData.get("password2")?.toString();
+
+      console.log("Form submitted with:", {
+        name,
+        email,
+        password1,
+        password2
+      });
+
+      if (!name || !email || !password1 || !password2) {
+        toast.error("Please fill in all fields.");
+        return;
+      }
+
+      name = name.trim();
+      email = email.trim();
+
+      toast.dismiss();
+      const loader = toast.loading("Creating account...");
+
+      let state = SignupStates.ERR_UNKNOWN;
+      state = await signupEmailPass(email, password1, password2, name);
+
+      toast.dismiss(loader);
+
+      switch (state) {
+        case SignupStates.SUCCESS:
+          toast.success("Account created successfully!");
+          redirectToHome();
+          break;
+        case SignupStates.ERR_EMAIL_NOT_PROVIDED:
+          toast.error("Email is required.");
+          break;
+        case SignupStates.ERR_PASSWORD_NOT_PROVIDED:
+          toast.error("Password is required.");
+          break;
+        case SignupStates.ERR_NAME_NOT_PROVIDED:
+          toast.error("Display name is required.");
+          break;
+        case SignupStates.ERR_INVALID_EMAIL:
+          toast.error("Please enter a valid email address.");
+          break;
+        case SignupStates.ERR_INVALID_NAME:
+          toast.error("Display name can only contain letters and numbers.");
+          break;
+        case SignupStates.ERR_NAME_TOO_SHORT:
+          toast.error("Display name must be at least 3 characters long.");
+          break;
+        case SignupStates.ERR_PASSWORD_TOO_SHORT:
+          toast.error("Password must be at least 8 characters long.");
+          break;
+        case SignupStates.ERR_PASSWORDS_DONT_MATCH:
+          toast.error("Passwords do not match.");
+          break;
+        case SignupStates.ERR_ALREADY_EXISTS:
+          toast.error("An account with this email already exists.");
+          toast.info(
+            "Looks like you have an account. Do you want to log in instead?",
+            {
+              duration: 10000,
+              action: {
+                label: "Take me there",
+                onClick: () => {
+                  router.push("/auth/login");
+                }
+              }
+            }
+          );
+          break;
+        case SignupStates.ERR_UNKNOWN:
+        default:
+          toast.error("Something went wrong. Please try again later.");
+          break;
+      }
+    },
+    [redirectToHome, router]
+  );
 
   useEffect(() => {
     setRenderOnlyHome(true);
     setDefaultShown(false);
 
-    window.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        handleSubmit();
-      }
-    });
-
     return () => {
       setRenderOnlyHome(false);
       setDefaultShown(true);
     };
-  }, [handleSubmit, setRenderOnlyHome, setDefaultShown]);
+  }, [handleSubmit, setDefaultShown, setRenderOnlyHome]);
 
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -204,95 +222,68 @@ export default function LoginForm() {
                     Or continue with
                   </span>
                 </div>
-                <div className="grid gap-6">
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="name" className="text-foreground">
-                        Display Name
-                      </Label>
+                {isHydrated ? (
+                  <form className="grid gap-6" onSubmit={handleSubmit}>
+                    <div className="grid gap-3">
+                      <div className="flex items-center">
+                        <Label htmlFor="name" className="text-foreground">
+                          Display Name
+                        </Label>
+                      </div>
+                      <Input
+                        name="name"
+                        type="text"
+                        className="bg-input border-border text-foreground"
+                        autoCorrect="off"
+                      />
                     </div>
-                    <Input
-                      name="name"
-                      type="text"
-                      className="bg-input border-border text-foreground"
-                      onChange={(e) => {
-                        setUserData((d) => ({
-                          ...d,
-                          name: e.target.value
-                        }));
-                      }}
-                      value={userData.name}
-                      autoCorrect="off"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="email" className="text-foreground">
-                      Email
-                    </Label>
-                    <Input
-                      name="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      className="bg-input border-border text-foreground placeholder:text-muted-foreground"
-                      onChange={(e) => {
-                        setUserData((d) => ({
-                          ...d,
-                          email: e.target.value
-                        }));
-                      }}
-                      value={userData.email}
-                      autoComplete="email"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="password1" className="text-foreground">
-                        Password
+                    <div className="grid gap-3">
+                      <Label htmlFor="email" className="text-foreground">
+                        Email
                       </Label>
+                      <Input
+                        name="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        className="bg-input border-border text-foreground placeholder:text-muted-foreground"
+                        autoComplete="email"
+                      />
                     </div>
-                    <PasswordBlock
-                      name="password1"
-                      type="password"
-                      className="bg-input border-border text-foreground"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setUserData((d) => ({
-                          ...d,
-                          password1: e.target.value
-                        }));
-                      }}
-                      value={userData.password1}
-                      autoComplete="current-password"
-                      autoCorrect="off"
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <div className="flex items-center">
-                      <Label htmlFor="password1" className="text-foreground">
-                        Confirm Password
-                      </Label>
+                    <div className="grid gap-3">
+                      <div className="flex items-center">
+                        <Label htmlFor="password1" className="text-foreground">
+                          Password
+                        </Label>
+                      </div>
+                      <PasswordBlock
+                        name="password1"
+                        className="bg-input border-border text-foreground"
+                        autoComplete="new-password"
+                        autoCorrect="off"
+                      />
                     </div>
-                    <PasswordBlock
-                      name="password1"
-                      type="password"
-                      className="bg-input border-border text-foreground"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setUserData((d) => ({
-                          ...d,
-                          password2: e.target.value
-                        }));
-                      }}
-                      value={userData.password2}
-                      autoComplete="current-password"
-                      autoCorrect="off"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={handleSubmit}>
-                    Sign Up
-                  </Button>
-                </div>
+                    <div className="grid gap-3">
+                      <div className="flex items-center">
+                        <Label htmlFor="password2" className="text-foreground">
+                          Confirm Password
+                        </Label>
+                      </div>
+                      <PasswordBlock
+                        name="password2"
+                        className="bg-input border-border text-foreground"
+                        autoComplete="new-password"
+                        autoCorrect="off"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Sign Up
+                    </Button>
+                  </form>
+                ) : (
+                  <SkeletonSignupForm />
+                )}
                 <div className="text-center text-sm text-muted-foreground">
                   Already have an account?{" "}
                   <a

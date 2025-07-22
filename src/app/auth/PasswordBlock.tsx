@@ -18,6 +18,7 @@ export default function PasswordBlock(props: any) {
     <div className="flex items-center space-x-2">
       <Input {...attr} />
       <Button
+        type="button"
         className="p-0 aspect-square"
         variant={"outline"}
         onClick={() => SETpasswordVisible(!passwordVisible)}>
