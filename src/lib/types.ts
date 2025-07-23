@@ -11,39 +11,7 @@ export interface t_pb_User extends RecordModel {
   name: string;
   updated: string;
   verified: boolean;
-  role: "member" | "admin" | "guest";
-}
-
-export interface t_pb_UserData extends RecordModel {
-  created: string;
-  updated: string;
-  user: string;
-  outreachMinutes: number;
-  buildMinutes: number;
-  lastOutreachEvent: string;
-  lastBuildEvent: string;
-  expand?: {
-    user: t_pb_User;
-  };
-}
-
-export interface t_pb_OutreachEvent extends RecordModel {
-  id: string;
-  name: string;
-  created: string;
-  updated: string;
-  date: string;
-}
-
-export interface t_pb_OutreachSession extends RecordModel {
-  id: string;
-  user: string;
-  minutes: number;
-  created: string;
-  expand?: {
-    user: t_pb_User;
-    event: t_pb_OutreachEvent;
-  };
+  usesOAuth: boolean;
 }
 
 export type OAuthProvider = "google" | "discord";

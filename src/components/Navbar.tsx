@@ -18,26 +18,21 @@ import {
   FileSpreadsheet,
   Clock,
   Signature,
-  Construction
+  Construction,
+  MessageSquareQuote
 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import NavbarSkeleton from "./skeletons/NavbarSkeleton";
 import { Separator } from "@/components/ui/separator";
 
-const allItems = [
+const NAV_ITEMS = [
   {
     onlyHomePersist: true,
     icon: <User className="h-5 w-5" />,
-    label: "Home",
-    url: "/",
-    msg: "Going Home"
-  },
-  {
-    icon: <FileSpreadsheet className="h-5 w-5" />,
-    label: "Budget",
-    url: "/budget",
-    msg: "Going to the Budget Sheet",
+    label: "Dashboard",
+    url: "/dashboard",
+    msg: "Going to your Dashboard",
     func: () => {
       toast(
         <div className="flex gap-4">
@@ -49,15 +44,15 @@ const allItems = [
     }
   },
   {
-    icon: <Clock className="h-5 w-5" />,
-    label: "Outreach",
-    url: "/outreach",
-    msg: "Going to the Outreach Sheet"
+    icon: <MessageSquareQuote className="h-5 w-5" />,
+    label: "Chat",
+    url: "/chat",
+    msg: "Lets Scrapp!",
   },
   {
     onlyHomePersist: true,
     icon: <Signature className="h-5 w-5" />,
-    label: "Sign Out",
+    label: "(testing only) Sign Out",
     url: "/",
     msg: "Signing Out",
     func: () => {
@@ -73,11 +68,21 @@ const allItems = [
   // }
 ];
 
-export type NavItems = typeof allItems;
+const PROFILE_ITEM = {
+  url: "/user/profile",
+  msg: "Going to Profile"
+};
+
+const LOGIN_ITEM = {
+  url: "/auth/login",
+  msg: "Going to Login"
+};
+
+export type NavItems = typeof NAV_ITEMS;
 
 type ChildProps = {
   user: t_pb_User | null;
-  navItems: typeof allItems;
+  navItems: typeof NAV_ITEMS;
   onNavigate: (url: { url: string; msg?: string }) => void;
   defaultToShown: boolean;
 };
@@ -94,8 +99,8 @@ export default function Navbar({}) {
   if (!isHydrated) return null; //<NavbarSkeleton navItems={allItems} />;
 
   const navItems = state.renderOnlyHome
-    ? allItems.filter((item) => item.onlyHomePersist)
-    : allItems;
+    ? NAV_ITEMS.filter((item) => item.onlyHomePersist)
+    : NAV_ITEMS;
 
   const onNavigate = function ({
     url,
@@ -131,11 +136,7 @@ function Mobile({ navItems, user, onNavigate }: ChildProps) {
             variant="ghost"
             size="sm"
             className="flex flex-col items-center space-y-1 text-muted-foreground hover:text-foreground h-auto py-1.5 px-2 transition-all duration-300 ease-in-out opacity-100"
-            onClick={onNavigate.bind(null, {
-              url: item.url,
-              msg: item?.msg,
-              func: item?.func
-            })}>
+            onClick={onNavigate.bind(null, item)}>
             <div className="flex items-center justify-center transition-all duration-300 ease-in-out">
               {item.icon}
             </div>
@@ -149,10 +150,7 @@ function Mobile({ navItems, user, onNavigate }: ChildProps) {
             variant="ghost"
             size="sm"
             className="flex flex-col items-center space-y-1 text-muted-foreground hover:text-foreground h-auto py-1.5 px-2"
-            onClick={onNavigate.bind(null, {
-              url: "/account",
-              msg: "Going to Account"
-            })}>
+            onClick={onNavigate.bind(null, PROFILE_ITEM)}>
             <div className="flex items-center justify-center">
               <Avatar className="h-5 w-5">
                 <AvatarImage
@@ -172,10 +170,7 @@ function Mobile({ navItems, user, onNavigate }: ChildProps) {
             variant="default"
             size="sm"
             className="flex flex-col items-center space-y-1 h-auto py-1.5 px-2"
-            onClick={onNavigate.bind(null, {
-              url: "/login",
-              msg: "Going to Login"
-            })}>
+            onClick={onNavigate.bind(null, LOGIN_ITEM)}>
             <div className="flex items-center justify-center">
               <User className="h-5 w-5" />
             </div>
@@ -254,11 +249,7 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                 size="sm"
                 className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100"
                 key={index}
-                onClick={onNavigate.bind(null, {
-                  url: item.url,
-                  msg: item?.msg,
-                  func: item?.func
-                })}>
+                onClick={onNavigate.bind(null, item)}>
                 <div className="size-4 transition-all duration-300 ease-in-out">
                   {item.icon}
                 </div>
@@ -270,9 +261,9 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
 
             {user ? (
               <div className="flex items-center space-x-3 pl-6 ml-2 border-l border-border">
-                <Link
-                  href="/profile"
-                  className="flex items-center space-x-3 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100 group">
+                <button
+                  onClick={() => onNavigate(PROFILE_ITEM)}
+                  className="flex items-center space-x-3 text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out opacity-100 group bg-transparent border-none cursor-pointer">
                   <div className="hidden flex-col items-start md:flex">
                     <span className="text-sm font-medium text-foreground underline transition-all duration-200 ease-in-out decoration-transparent group-hover:decoration-current">
                       {user.name}
@@ -291,7 +282,7 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                       {user.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                </Link>
+                </button>
               </div>
             ) : (
               <div className="flex items-center space-x-3 pl-7 ml-2 border-l border-border">
@@ -299,10 +290,7 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                   variant="default"
                   size="sm"
                   className="flex items-center space-x-3"
-                  onClick={onNavigate.bind(null, {
-                    url: "/auth/login",
-                    msg: "Going to Login"
-                  })}>
+                  onClick={onNavigate.bind(null, LOGIN_ITEM)}>
                   <User className="h-4 w-4" />
                   <span className="text-sm font-medium">Log In</span>
                 </Button>

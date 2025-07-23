@@ -1,9 +1,10 @@
 "use client";
 
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,8 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Loader from "@/components/Loader";
-import Image from "next/image";
 import PasswordBlock from "../PasswordBlock";
 
 import { useIsHydrated } from "@/hooks/useIsHydrated";
@@ -29,11 +28,6 @@ export default function LoginForm() {
 
   const router = useRouter();
   const isHydrated = useIsHydrated();
-
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: ""
-  });
 
   const redirectToHome = useCallback(() => {
     console.log("Redirecting ...");
@@ -99,11 +93,6 @@ export default function LoginForm() {
         return;
       }
 
-      setLoginData({
-        email,
-        password
-      });
-
       toast.dismiss();
       const loader = toast.loading("Logging In ...");
 
@@ -146,7 +135,7 @@ export default function LoginForm() {
           break;
       }
     },
-    [loginData, redirectToHome]
+    [redirectToHome]
   );
 
   useEffect(() => {

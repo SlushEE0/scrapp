@@ -17,8 +17,8 @@ const geistSans = Geist({
 // });
 
 export const metadata: Metadata = {
-  title: "Optix Toolkit",
-  description: "DNHS Team Optix 3749"
+  title: "Scrapp",
+  description: "Time to scrap the right way!"
 };
 
 export default function RootLayout({

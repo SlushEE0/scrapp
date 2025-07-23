@@ -39,8 +39,7 @@ export async function create_User(
       password,
       passwordConfirm: password,
       emailVisibility: true,
-      name,
-      role: "member"
+      name
     });
 
     return [null, user.id];

@@ -6,11 +6,7 @@ const adminOnlyRoutes = ["/admin", "/testing", "/outreach/manage-events"];
 const authedOnlyRoutes = [
   "/dashboard",
   "/profile",
-  "/settings",
-  "/outreach",
-  "/build"
 ];
-// const publicPaths = ["/auth/unauthorized", "/auth/login", "/auth/signup"];
 
 export async function middleware(request: NextRequest) {
   const nextUrl = request.nextUrl.clone();

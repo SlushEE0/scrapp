@@ -58,8 +58,7 @@ export async function loginOAuth(provider: OAuthProvider) {
   const authData = await pb.collection("users").authWithOAuth2({
     provider,
     createData: {
-      usesOAuth: true,
-      role: "member"
+      usesOAuth: true
     }
   });
 
