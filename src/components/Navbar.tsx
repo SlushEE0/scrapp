@@ -47,7 +47,7 @@ const NAV_ITEMS = [
     icon: <MessageSquareQuote className="h-5 w-5" />,
     label: "Chat",
     url: "/chat",
-    msg: "Lets Scrapp!",
+    msg: "Lets Scrapp!"
   },
   {
     onlyHomePersist: true,
@@ -237,8 +237,8 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
   return (
     <div
       ref={navbarRef}
-      className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out w-max ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
+      className={`fixed top-2 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-initial w-max ${
+        isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-80"
       }`}>
       <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl px-6 py-3 transition-all duration-300 ease-in-out">
         <div className="flex items-center justify-between space-x-8 transition-all duration-300 ease-in-out">
@@ -268,9 +268,9 @@ function Desktop({ navItems, user, onNavigate, defaultToShown }: ChildProps) {
                     <span className="text-sm font-medium text-foreground underline transition-all duration-200 ease-in-out decoration-transparent group-hover:decoration-current">
                       {user.name}
                     </span>
-                    <span className="text-sm font-sm text-muted-foreground">
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                    </span>
+                    {/* <span className="text-sm font-sm text-muted-foreground">
+                      Scrapper
+                    </span> */}
                   </div>
                   <Avatar className="h-8 w-8">
                     <AvatarImage
