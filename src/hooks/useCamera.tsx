@@ -3,12 +3,7 @@
 import { useState, useRef, ComponentProps } from "react";
 import Webcam, { WebcamProps } from "react-webcam";
 
-interface CameraProps {
-  className?: string;
-  isActive?: boolean;
-}
-
-export default function useCamera({ className, isActive = true }: CameraProps) {
+export default function useCamera() {
   const webcamRef = useRef<Webcam>(null);
 
   const [facingMode, setFacingMode] = useState<"environment" | "user">(

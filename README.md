@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ♻️ Scrapp - Smart Waste Disposal Helper
 
-## Getting Started
+_Congressional App Challenge 2025 Submission_
 
-First, run the development server:
+## What is Scrapp?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Ever wondered if that weird plastic container can be recycled? Or where to throw
+away old batteries? Scrapp is here to help! Just take a photo of anything you
+want to dispose of, and our app will tell you exactly how to get rid of it
+properly.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**🚧 We're still building this - it's a work in progress!**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Why We Built This
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+We noticed that people (including ourselves) often don't know the right way to
+throw things away. This leads to recyclables ending up in landfills, hazardous
+items in regular trash, and a lot of confusion at the recycling bin.
 
-## Learn More
+We wanted to make it simple: take a picture, get an answer. No more guessing, no
+more complicated recycling guides - just quick, clear help when you need it.
 
-To learn more about Next.js, take a look at the following resources:
+## What We've Built So Far
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 📸 **Camera that works**: Point, shoot, and capture photos with your phone
+- 🔐 **User accounts**: Sign up with email or use Google/Discord login
+- 📱 **Mobile-friendly**: Works great on phones and computers
+- � **Clean design**: Simple, easy-to-use interface
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## What's Coming Next
 
-## Deploy on Vercel
+- 🤖 **AI-Powered Recognition**: Analyze captured images to identify waste items
+- 🗂️ **Disposal Recommendations**: Provide specific disposal instructions based
+  on item type and location
+- 📍 **Location-Based Services**: Find nearby recycling centers and disposal
+  facilities
+- 📊 **Impact Tracking**: Monitor environmental impact and disposal habits
+- 🏆 **Gamification**: Achievement system to encourage proper waste disposal
+- 📱 **Progressive Web App**: Offline functionality and app-like experience
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stuff
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Frontend (this repo)**: Next.js, React, TypeScript, Tailwind CSS **Backend**:
+[Check out our backend here](https://github.com/adikatre/Congressional-App-Challenge-Backend)
+**Database**: PocketBase for user data **AI**: Backend handles the smart image
+recognition
+
+## Congressional App Challenge
+
+We're high school students participating in the Congressional App
+Challenge 2025. The challenge asks students to create apps that help their
+communities, and we chose to tackle the confusion around proper waste disposal.
+
+**The Problem**: People don't know how to dispose of things properly, which
+hurts the environment.
+
+**Our Solution**: Scrapp makes it simple - just take a photo and get clear
+disposal instructions.
+
+## What's Next
+
+- [ ] Connect the AI brain (image recognition)
+- [ ] Show disposal recommendations
+- [ ] Find nearby recycling centers
+- [ ] Track your environmental impact
+- [ ] Add fun achievements for good disposal habits
+- [ ] Make it work offline too
+
+## The Team
+
+- **Frontend**: [SlushEE0](https://github.com/adikatre) (that's me!)
+- **Backend & AI**: [adikatre](https://github.com/adikatre)
+
+---
+
+_Making waste disposal less confusing, one photo at a time._ 📱♻️

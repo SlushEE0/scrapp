@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ChangeEvent, Suspense, useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
 import { useNavbar } from "@/hooks/useNavbar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { Camera as CameraIcon, Send, Trash } from "lucide-react";
+import { Camera as CameraIcon, Send, Trash, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Loader from "@/components/Loader";
 
 interface Message {
   id: string;
@@ -33,51 +35,58 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const [messages, setMessages] = useState<Message[]>(ALL_MESSAGES);
+  const [chatPrompt, setChatPrompt] = useState("");
+
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [isCameraSheetOpen, setIsCameraSheetOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      message: "Hello! How can I help you today?",
-      isUser: false,
-      timestamp: new Date(Date.now() - 5 * 60 * 1000)
-    },
-    {
-      id: "2",
-      message: "I'd like to know more about this app's features.",
-      isUser: true,
-      timestamp: new Date(Date.now() - 3 * 60 * 1000)
-    },
-    {
-      id: "3",
-      message:
-        "This is a modern chat application with camera integration. You can capture images and send messages in real-time. The interface is responsive and works great on both desktop and mobile devices.",
-      isUser: false,
-      timestamp: new Date(Date.now() - 1 * 60 * 1000)
-    }
-  ]);
+  const cameraRef = useRef<Webcam>(null);
+  const [cameraFacingMode, setCameraFacingMode] = useState<
+    "user" | "environment"
+  >("environment");
 
   const { setDefaultShown } = useNavbar();
   const isMobile = useIsMobile();
-
-  const Camera = useCamera({});
 
   useEffect(() => {
     setDefaultShown(false);
   }, [setDefaultShown]);
 
-  const onImageCapture = function () {
-    const imageData = Camera.getCaptureImage();
-    setCapturedImage(imageData || null);
-    if (isMobile) {
-      setIsCameraSheetOpen(false);
+  const handleCaptureImage = function () {
+    if (cameraRef.current) {
+      const image = cameraRef.current.getScreenshot();
+      setCapturedImage(image);
+
+      console.log("captured");
     }
   };
 
-  const onCameraClose = function () {
-    if (isMobile) {
-      setIsCameraSheetOpen(false);
-    }
+  const handleModifyChatPrompt = function (
+    e: ChangeEvent<HTMLTextAreaElement>
+  ) {
+    setChatPrompt(e.target.value);
+  };
+
+  const handleFormSubmit = function (formData: FormData) {
+    const prompt = formData.get("prompt")?.toString() || "";
+    setChatPrompt("");
+
+    setMessages((messages) => [
+      ...messages,
+      {
+        id: "4",
+        isUser: true,
+        message: prompt,
+        timestamp: new Date()
+      }
+    ]);
+  };
+
+  const handleClearImage = function () {
+    setCapturedImage(null);
+  };
+
+  const handleClearText = function () {
+    setChatPrompt("");
   };
 
   return (
@@ -86,97 +95,98 @@ export default function ChatPage() {
         <CardHeader>
           <CardTitle>Chat</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-scroll">{lorem}</CardContent>
-        <CardFooter className="flex gap-2">
-          <Textarea
-            placeholder="Let's chat!"
-            className="size-full border outline-none resize-none"
-          />
-          <div className="h-full flex flex-col gap-2">
-            <Button variant="outline" className="self-end size-10">
-              <Trash className="size-5" />
-            </Button>
-            <Button variant="outline" className="self-end size-10">
-              <Send className="size-5" />
-            </Button>
+        <CardContent className="overflow-scroll h-full">
+          {messages.map((message) => (
+            <MessageBubble {...message} key={message.id} />
+          ))}
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <div className="flex gap-2 justify-baseline items-baseline w-full">
+            <div className="relative group">
+              <img
+                src={capturedImage || undefined}
+                className="h-30 rounded-md"
+              />
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-100 rounded-md flex items-center justify-center">
+                <X
+                  className="size-6 text-white cursor-pointer"
+                  onClick={handleClearImage}
+                />
+              </div>
+            </div>
           </div>
+          <form
+            className="w-full flex items-center gap-2 p-0"
+            action={handleFormSubmit}>
+            <Textarea
+              enterKeyHint="send"
+              name="prompt"
+              value={chatPrompt}
+              onChange={handleModifyChatPrompt}
+              placeholder="Let's chat!"
+              className="size-full border outline-none resize-none h-22"
+            />
+            <div className="h-full flex flex-col gap-2">
+              <Button
+                onClick={handleClearText}
+                type="button"
+                variant="outline"
+                className="self-end size-10">
+                <Trash className="size-5" />
+              </Button>
+              <Button
+                type="submit"
+                variant="outline"
+                className="self-end size-10">
+                <Send className="size-5" />
+              </Button>
+            </div>
+          </form>
         </CardFooter>
       </Card>
       <Card className="flex-1">
         <CardHeader>
-          <CardTitle>Chat</CardTitle>
+          <CardTitle>Camera</CardTitle>
         </CardHeader>
-        <CardContent>hhehhehe</CardContent>
+        <CardContent>
+          {cameraRef ? (
+            <Webcam
+              className="rounded-md border"
+              ref={cameraRef}
+              mirrored={true}></Webcam>
+          ) : (
+            <Loader />
+          )}
+
+          <button
+            onClick={handleCaptureImage}
+            className="relative -top-5 -translate-y-full left-1/2 -translate-x-1/2 m-0 p-0 rounded-full size-20 bg-white/50 hover:bg-white/70 transition-all duration-200 flex items-center justify-center">
+            <CameraIcon className="size-full m-4 opacity-55" stroke="black" />
+          </button>
+        </CardContent>
       </Card>
     </div>
   );
 }
 
-var lorem = `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Porro
-          dolores, suscipit, expedita similique esse vitae culpa animi debitis
-          omnis at minima, sit placeat veritatis. Dolorem natus iusto
-          consequatur ea recusandae? Minima neque facere laborum fugit placeat
-          sed! Illum eveniet dolores dolorum a. Enim repellendus soluta quasi
-          ad, id hic similique aliquam nostrum facere vitae labore eum velit
-          ipsam provident ut! Nisi, eligendi tempora adipisci ipsa ipsum dolor,
-          error autem, natus at praesentium earum ullam. Autem inventore
-          voluptatem nulla, rerum similique, labore laboriosam, non perspiciatis
-          fuga ipsa voluptate! Exercitationem, nemo itaque. Molestias rem error
-          quasi rerum dolores eum suscipit debitis beatae vero reprehenderit
-          alias at id assumenda magnam animi soluta, deleniti quisquam maiores
-          accusantium, quo exercitationem! Error at ipsum odit! Suscipit?
-          Maiores, cupiditate mollitia! Ullam vel facilis aut quia, ea quis
-          modi? Illo earum, nesciunt libero debitis dicta dolor sapiente itaque
-          modi odio temporibus in aliquam aut error ab, rerum officia? Aliquid
-          recusandae corrupti est autem, iure totam molestias illum laudantium?
-          Est, nesciunt molestias? Magnam accusamus veritatis officiis,
-          distinctio vero, esse rem ullam autem accusantium nisi qui
-          necessitatibus. Doloremque, voluptatibus suscipit. Eveniet a inventore
-          ullam dolor iusto tenetur accusamus nulla ut tempora recusandae
-          aliquid neque, mollitia modi omnis, dignissimos magnam voluptatem.
-          Temporibus doloribus asperiores vero aut porro harum, numquam voluptas
-          quam. Distinctio consectetur, accusamus saepe exercitationem explicabo
-          pariatur mollitia omnis fugiat ab nihil nam perferendis ex dolores
-          labore eos, quas, assumenda in temporibus? Eum rem, delectus
-          laboriosam doloremque officiis voluptatum esse? Voluptatum eos saepe,
-          inventore quae consectetur cupiditate id ad est quos. Tenetur
-          doloremque inventore obcaecati tempore, iure, laboriosam cum, ratione
-          odit libero perspiciatis doloribus excepturi possimus hic? Quaerat,
-          nam nobis. Quisquam placeat provident beatae totam deserunt quibusdam
-          omnis earum incidunt nisi, veniam sint suscipit neque eveniet corporis
-          itaque maxime ullam facere dolor accusantium. Perferendis distinctio,
-          repudiandae ut hic autem praesentium. Vel, quia commodi reiciendis
-          libero similique at iusto, ipsa eveniet et cupiditate rem sint!
-          Dolorum exercitationem, ab est enim delectus molestias odio quae
-          facilis? Minima, maiores accusantium. Soluta, cumque vel. Similique
-          facilis odio deleniti ipsa velit enim quaerat dicta cumque est beatae
-          at nobis natus necessitatibus voluptatibus quidem magni, fugit
-          molestiae id ab repudiandae saepe sequi? Placeat esse corporis in?
-          Perspiciatis corporis ad quas eius quisquam quaerat, aspernatur
-          dolorem et similique laudantium quia dolorum esse. Perferendis
-          doloremque earum tempora magni, laboriosam dolores reprehenderit,
-          corporis magnam accusantium, debitis modi pariatur vitae. Iste ipsa
-          aut odit explicabo vitae sequi commodi eius voluptatum facere dolores
-          voluptatem nostrum doloribus sint suscipit eaque quae totam assumenda
-          possimus, sunt iure fugit ad placeat? Eligendi, eaque ullam! Sequi
-          eaque natus rerum earum nemo molestias, aperiam odit pariatur
-          distinctio obcaecati omnis quidem ducimus consequatur quod, laudantium
-          impedit quisquam incidunt error sed qui expedita neque. Officiis
-          voluptate modi suscipit. Accusamus perspiciatis praesentium ratione
-          placeat quasi nesciunt alias adipisci pariatur laboriosam, assumenda
-          veritatis ipsa recusandae dolorem numquam eaque minima! Repellendus
-          recusandae modi ex odio adipisci, nisi soluta animi ab harum. Ducimus
-          neque dolorem quo aliquid aspernatur, doloribus voluptatem, sequi
-          quidem, dolorum nam repudiandae? Expedita, est praesentium deserunt
-          distinctio repudiandae, itaque nostrum nihil culpa aliquid veniam
-          laboriosam? Incidunt quidem est cupiditate. Officia explicabo eos ex
-          earum similique minima magnam necessitatibus quasi labore quis tempora
-          tenetur magni aut ipsam expedita dolor reprehenderit quam voluptas
-          quo, animi nam tempore consectetur? Dolorem, nam earum! Quam doloribus
-          laboriosam officiis possimus at architecto inventore autem voluptate
-          iusto natus est ipsa corrupti doloremque, deleniti mollitia aperiam
-          quia incidunt saepe tenetur, officia in explicabo! Doloribus sequi at
-          officia? Accusantium, inventore esse ipsa aut ipsam excepturi amet
-          ratione similique earum nobis exercitationem quasi possimus quia qui
-          aperiam reprehenderit repellat maxime sit saepe! Nihil ratione magnam
-          iusto sequi at? Quam.`;
+var ALL_MESSAGES = [
+  {
+    id: "1",
+    message: "Hello! How can I help you today?",
+    isUser: false,
+    timestamp: new Date(Date.now() - 5 * 60 * 1000)
+  },
+  {
+    id: "2",
+    message: "I'd like to know more about this app's features.",
+    isUser: true,
+    timestamp: new Date(Date.now() - 3 * 60 * 1000)
+  },
+  {
+    id: "3",
+    message:
+      "This is a modern chat application with camera integration. You can capture images and send messages in real-time. The interface is responsive and works great on both desktop and mobile devices.",
+    isUser: false,
+    timestamp: new Date(Date.now() - 1 * 60 * 1000)
+  }
+];
