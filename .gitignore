@@ -2,6 +2,7 @@
 
 /src/app/testing
 Dockerfile
+serve-tailscale.ps1
 
 # dependencies
 /node_modules
