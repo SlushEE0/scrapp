@@ -26,24 +26,31 @@ import { MessageBubble } from "@/components/MessageBubble";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "@/components/Loader";
 import { toast } from "sonner";
+import { ImageDetectionViewer } from "@/components/ImageDetectionViewer";
+import { predict } from "@/lib/backend";
+import { BaseStates } from "@/lib/states";
+import { PredictionResult } from "@/lib/types";
+import { dataURLtoFile, summarizePrediction } from "@/lib/utils";
 
 interface Message {
   id: string;
   message: string;
+  image?: string | null;
   isUser: boolean;
   timestamp: Date;
-  image?: string | null;
 }
 
 interface MobileChatPageProps {
   messages: Message[];
-  onSendMessage: (message: string, image?: string | null) => void;
+  onSendMessage: (payload: { text?: string; image?: string | null }) => void;
+  onAssistantMessage: (message: string) => void;
   isMobile: boolean;
 }
 
 export default function MobileChatPage({
   messages,
   onSendMessage,
+  onAssistantMessage,
   isMobile
 }: MobileChatPageProps) {
   const [chatPrompt, setChatPrompt] = useState("");
@@ -54,6 +61,10 @@ export default function MobileChatPage({
   >("environment");
   const [isCapturing, setIsCapturing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedImageForViewer, setSelectedImageForViewer] = useState<
+    string | null
+  >(null);
 
   const { setDefaultShown } = useNavbar();
 
@@ -131,13 +142,29 @@ export default function MobileChatPage({
     setChatPrompt(e.target.value);
   };
 
-  const handleFormSubmit = function () {
+  const handleFormSubmit = async function () {
     const prompt = chatPrompt;
 
     if (prompt.trim() || capturedImage) {
       setChatPrompt("");
-      onSendMessage(prompt, capturedImage);
-      setCapturedImage(null); // Clear the image after sending
+      onSendMessage({ text: prompt.trim() || undefined, image: capturedImage });
+
+      const fd = new FormData();
+      if (prompt.trim()) fd.append("text", prompt.trim());
+      if (capturedImage) {
+        const file = dataURLtoFile(capturedImage, `capture-${Date.now()}.png`);
+        if (file) fd.append("file", file);
+      }
+
+      try {
+        if (fd.has("text") || fd.has("file")) {
+          const [state, res] = await predict(fd);
+          if (state === BaseStates.ERROR || !res) return;
+          onAssistantMessage(summarizePrediction(res));
+        }
+      } catch (e) {
+        // ignore for now
+      }
     }
   };
 
@@ -152,11 +179,7 @@ export default function MobileChatPage({
   };
 
   return (
-    <section
-      className={
-        "h-screen flex flex-col bg-gradient-to-br from-background to-muted/20" +
-        (isMobile ? " pb-20" : "")
-      }>
+    <section className="h-screen flex flex-col bg-gradient-to-br from-background to-muted/20">
       {/* Chat Section */}
       <Card className="flex-1 m-3 shadow-lg border-muted/40 flex flex-col">
         <CardHeader className="pb-3">
@@ -167,7 +190,14 @@ export default function MobileChatPage({
         </CardHeader>
         <CardContent className="flex-1 overflow-scroll px-4">
           {messages.map((message) => (
-            <MessageBubble {...message} key={message.id} />
+            <MessageBubble
+              {...message}
+              key={message.id}
+              onImageClick={(src) => {
+                setSelectedImageForViewer(src);
+                setViewerOpen(true);
+              }}
+            />
           ))}
         </CardContent>
         <CardFooter className="flex-col gap-3 p-4">
@@ -177,7 +207,11 @@ export default function MobileChatPage({
                 <img
                   src={capturedImage}
                   alt="Captured"
-                  className="h-24 w-auto rounded-lg border-2 border-muted shadow-md"
+                  onClick={() => {
+                    setSelectedImageForViewer(capturedImage);
+                    setViewerOpen(true);
+                  }}
+                  className="h-24 w-auto rounded-lg border-2 border-muted shadow-md cursor-pointer"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center gap-2">
                   <Button
@@ -315,6 +349,13 @@ export default function MobileChatPage({
           </div>
         </div>
       )}
+
+      {/* Detection viewer modal */}
+      <ImageDetectionViewer
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        imageSrc={selectedImageForViewer}
+      />
     </section>
   );
 }

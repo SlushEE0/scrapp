@@ -24,29 +24,40 @@ import { Button } from "@/components/ui/button";
 import { MessageBubble } from "@/components/MessageBubble";
 import { Textarea } from "@/components/ui/textarea";
 import Loader from "@/components/Loader";
+import { ImageDetectionViewer } from "@/components/ImageDetectionViewer";
+import { predict } from "@/lib/backend";
+import { BaseStates } from "@/lib/states";
+import { toast } from "sonner";
+import { dataURLtoFile, summarizePrediction } from "@/lib/utils";
 
 interface Message {
   id: string;
   message: string;
+  image?: string | null;
   isUser: boolean;
   timestamp: Date;
-  image?: string | null;
 }
 
 interface DesktopChatPageProps {
   messages: Message[];
-  onSendMessage: (message: string, image?: string | null) => void;
+  onSendMessage: (payload: { text?: string; image?: string | null }) => void;
+  onAssistantMessage: (message: string) => void;
 }
 
 export default function DesktopChatPage({
   messages,
-  onSendMessage
+  onSendMessage,
+  onAssistantMessage
 }: DesktopChatPageProps) {
   const [chatPrompt, setChatPrompt] = useState("");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const cameraRef = useRef<Webcam>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isCameraExpanded, setIsCameraExpanded] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedImageForViewer, setSelectedImageForViewer] = useState<
+    string | null
+  >(null);
 
   const { setDefaultShown } = useNavbar();
 
@@ -113,13 +124,35 @@ export default function DesktopChatPage({
     setChatPrompt(e.target.value);
   };
 
-  const handleFormSubmit = function () {
+  const handleFormSubmit = async function () {
     const prompt = chatPrompt;
 
     if (prompt.trim() || capturedImage) {
       setChatPrompt("");
-      onSendMessage(prompt, capturedImage);
-      setCapturedImage(null); // Clear the image after sending
+      onSendMessage({ text: prompt.trim() || undefined, image: capturedImage });
+
+      // Build FormData with text and optional file
+      const fd = new FormData();
+      if (prompt.trim()) fd.append("text", prompt.trim());
+      if (capturedImage) {
+        const file = dataURLtoFile(capturedImage, `capture-${Date.now()}.png`);
+        if (file) {
+          fd.append("file", file);
+        } else {
+          toast.error("Failed to process image");
+        }
+      }
+
+      try {
+        if (fd.has("text") || fd.has("file")) {
+          const [state, res] = await predict(fd);
+          if (state === BaseStates.ERROR || !res)
+            return toast.error("Prediction failed");
+          onAssistantMessage(summarizePrediction(res));
+        }
+      } catch (e) {
+        toast.error("Prediction error");
+      }
     }
   };
 
@@ -139,7 +172,14 @@ export default function DesktopChatPage({
         </CardHeader>
         <CardContent className="flex-3 overflow-scroll">
           {messages.map((message) => (
-            <MessageBubble {...message} key={message.id} />
+            <MessageBubble
+              {...message}
+              key={message.id}
+              onImageClick={(src) => {
+                setSelectedImageForViewer(src);
+                setViewerOpen(true);
+              }}
+            />
           ))}
         </CardContent>
         <CardFooter className="flex-col gap-4">
@@ -149,7 +189,11 @@ export default function DesktopChatPage({
                 <img
                   src={capturedImage}
                   alt="Captured"
-                  className="h-32 w-auto rounded-lg border-2 border-muted shadow-md"
+                  onClick={() => {
+                    setSelectedImageForViewer(capturedImage);
+                    setViewerOpen(true);
+                  }}
+                  className="h-32 w-auto rounded-lg border-2 border-muted shadow-md cursor-pointer"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center gap-2">
                   <Button
@@ -303,6 +347,13 @@ export default function DesktopChatPage({
           )}
         </CardContent>
       </Card>
+
+      {/* Detection viewer modal */}
+      <ImageDetectionViewer
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+        imageSrc={selectedImageForViewer}
+      />
     </div>
   );
 }

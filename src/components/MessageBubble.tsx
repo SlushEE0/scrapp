@@ -3,18 +3,23 @@
 import { cn } from "@/lib/utils";
 
 interface MessageBubbleProps {
-  message: string;
+  message?: string;
+  image?: string | null;
   isUser: boolean;
   timestamp?: Date;
-  image?: string | null;
+  onImageClick?: (src: string) => void;
 }
 
 export function MessageBubble({
   message,
+  image,
   isUser,
   timestamp,
-  image
+  onImageClick
 }: MessageBubbleProps) {
+  const hasText = !!(message && message.length > 0)
+  const hasImage = !!image
+
   return (
     <div
       className={cn(
@@ -28,16 +33,20 @@ export function MessageBubble({
             ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
             : "bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100"
         )}>
-        {image && (
-          <div className="mb-2">
-            <img
-              src={image}
-              alt="Shared image"
-              className="max-w-full h-auto rounded-lg border border-white/20"
-            />
-          </div>
+        {hasImage && (
+          <img
+            src={image as string}
+            alt="attachment"
+            onClick={() => image && onImageClick?.(image)}
+            className={cn(
+              "mb-2 max-h-64 w-auto rounded-lg border border-white/20",
+              onImageClick ? "cursor-pointer" : ""
+            )}
+          />
         )}
-        <p className="text-sm leading-relaxed break-words">{message}</p>
+        {hasText && (
+          <p className="text-sm whitespace-pre-wrap">{message}</p>
+        )}
         {timestamp && (
           <p
             className={cn(

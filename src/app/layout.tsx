@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 
-const geistSans = Geist({
+const fontFamily = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"]
 });
@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={"dark"}>
         <main
-          className={`w-full ${geistSans.className} antialiased`}>
+          className={`w-full ${fontFamily.className} antialiased`}>
           <Navbar />
           <Toaster />
           {children}

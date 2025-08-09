@@ -9,26 +9,41 @@ import useMediaQuery from "@/hooks/useMediaQuery";
 interface Message {
   id: string;
   message: string;
+  image?: string | null;
   isUser: boolean;
   timestamp: Date;
-  image?: string | null;
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>(ALL_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const isMobile = useIsMobile();
 
   const meetsQuery = useMediaQuery(1100);
 
-  const handleSendMessage = function (message: string, image?: string | null) {
+  const handleSendMessage = function (payload: {
+    text?: string;
+    image?: string | null;
+  }) {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
         id: `${Date.now()}-${Math.random()}`,
         isUser: true,
-        message: message,
-        timestamp: new Date(),
-        image: image || null
+        message: payload.text ?? "",
+        image: payload.image ?? null,
+        timestamp: new Date()
+      }
+    ]);
+  };
+
+  const handleAssistantMessage = function (message: string) {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: `${Date.now()}-${Math.random()}`,
+        isUser: false,
+        message,
+        timestamp: new Date()
       }
     ]);
   };
@@ -38,34 +53,17 @@ export default function ChatPage() {
       <MobileChatPage
         messages={messages}
         onSendMessage={handleSendMessage}
+        onAssistantMessage={handleAssistantMessage}
         isMobile={isMobile ?? true}
       />
     );
   }
 
   return (
-    <DesktopChatPage messages={messages} onSendMessage={handleSendMessage} />
+    <DesktopChatPage
+      messages={messages}
+      onSendMessage={handleSendMessage}
+      onAssistantMessage={handleAssistantMessage}
+    />
   );
 }
-
-var ALL_MESSAGES = [
-  {
-    id: "1",
-    message: "Hello! How can I help you today?",
-    isUser: false,
-    timestamp: new Date(Date.now() - 5 * 60 * 1000)
-  },
-  {
-    id: "2",
-    message: "I'd like to know more about this app's features.",
-    isUser: true,
-    timestamp: new Date(Date.now() - 3 * 60 * 1000)
-  },
-  {
-    id: "3",
-    message:
-      "This is a modern chat application with camera integration. You can capture images and send messages in real-time. The interface is responsive and works great on both desktop and mobile devices.",
-    isUser: false,
-    timestamp: new Date(Date.now() - 1 * 60 * 1000)
-  }
-];
