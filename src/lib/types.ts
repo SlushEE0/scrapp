@@ -1,19 +1,3 @@
-import { type RecordModel } from "pocketbase";
-
-export interface pb_UsersColItem extends RecordModel {
-  avatar: string;
-  collectionId: string;
-  collectionName: string;
-  created: string;
-  email: string;
-  emailVisibility: boolean;
-  id: string;
-  name: string;
-  updated: string;
-  verified: boolean;
-  usesOAuth: boolean;
-}
-
 export type PredictionObjects =
   | "bottle"
   | "wine glass"
@@ -61,5 +45,3 @@ export type PredictionResult = {
   bin_totals: Record<string, number>;
   detections: Detection[];
 };
-
-export type OAuthProvider = "google" | "discord";

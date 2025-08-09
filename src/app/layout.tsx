@@ -31,7 +31,6 @@ export default function RootLayout({
       <body className={"dark"}>
         <main
           className={`w-full ${fontFamily.className} antialiased`}>
-          <Navbar />
           <Toaster />
           {children}
         </main>
