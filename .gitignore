@@ -4,8 +4,6 @@
 Dockerfile
 serve-tailscale.ps1
 
-*backend*
-
 # dependencies
 /node_modules
 /.pnp
