@@ -22,9 +22,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={"dark"}>
-        <main
-          className={`w-full ${fontFamily.className} antialiased`}>
+      <body className="dark">
+        <main className={`w-full ${fontFamily.className} antialiased`}>
           <Toaster />
           {children}
         </main>

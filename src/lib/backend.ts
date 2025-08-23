@@ -1,3 +1,5 @@
+"use server";
+
 import { BaseStates } from "./states";
 import { PredictionResult } from "./types";
 

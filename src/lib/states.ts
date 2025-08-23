@@ -1,5 +1,7 @@
 export enum BaseStates {
   SUCCESS,
   ERROR,
-  LOADING
+  LOADING,
+  ERRCONN,
+  NO_RES
 }
