@@ -73,5 +73,8 @@ export function summarizePrediction(p: PredictionResult) {
     msg += `${detection.class_name}: ${detection.route}\n`;
   });
 
+  msg += "\n\n";
+  msg += p.text;
+
   return msg;
 }

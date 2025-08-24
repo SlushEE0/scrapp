@@ -27,11 +27,7 @@ export type PredictionObjects =
   | "backpack"
   | "umbrella";
 
-export type PredictionRoutes =
-  | "Recycle"
-  | "Compost"
-  | "Store Drop-off"
-  | "Landfill / Donate / Check rules";
+export type PredictionRoutes = string;
 
 export type Detection = {
   bbox: [number, number, number, number];
@@ -44,4 +40,5 @@ export type PredictionResult = {
   objects: PredictionObjects[];
   bin_totals: Record<string, number>;
   detections: Detection[];
+  text: string;
 };
