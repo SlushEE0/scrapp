@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Scrapp",
     description: "Your buddy for better disposal",
     start_url: "/",
-    display: "minimal-ui",
+    display: "standalone",
     background_color: "#d0f1c5",
     theme_color: "#19573f",
     icons: [
