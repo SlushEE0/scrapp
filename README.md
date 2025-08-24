@@ -21,7 +21,6 @@ more complicated recycling guides - just quick, clear help when you need it.
 ## What We've Built So Far
 
 - 📸 **Camera that works**: Point, shoot, and capture photos with your phone
-- 🔐 **User accounts**: Sign up with email or use Google/Discord login
 - 📱 **Mobile-friendly**: Works great on phones and computers
 - � **Clean design**: Simple, easy-to-use interface
 
@@ -40,8 +39,6 @@ more complicated recycling guides - just quick, clear help when you need it.
 
 **Frontend (this repo)**: Next.js, React, TypeScript, Tailwind CSS **Backend**:
 [Check out our backend here](https://github.com/adikatre/Congressional-App-Challenge-Backend)
-**Database**: PocketBase for user data **AI**: Backend handles the smart image
-recognition
 
 ## Congressional App Challenge
 
