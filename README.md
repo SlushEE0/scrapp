@@ -9,8 +9,6 @@ away old batteries? Scrapp is here to help! Just take a photo of anything you
 want to dispose of, and our app will tell you exactly how to get rid of it
 properly.
 
-**🚧 We're still building this - it's a work in progress!**
-
 ## Why We Built This
 
 We noticed that people (including ourselves) often don't know the right way to
