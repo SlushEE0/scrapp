@@ -170,7 +170,7 @@ export default function DesktopChatPage({
             Chat
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-3 overflow-scroll">
+        <CardContent className="flex-3 h-full overflow-y-scroll">
           {messages.map((message) => (
             <MessageBubble
               {...message}
