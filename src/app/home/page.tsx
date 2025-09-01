@@ -45,79 +45,18 @@ const useOnScreen = (options: IntersectionObserverInit) => {
 
 // A component for an animated statistic card.
 // It uses the useOnScreen hook to trigger a count-up animation.
-// animatedstastic1 = fast stastic for the middle data point. increments by 5 each time
-const AnimatedStatisticFast = ({
-  icon: Icon,
-  value,
-  label,
-  suffix = "",
-}: {
-  icon: React.ElementType;
-  value: number;
-  label: string;
-  suffix?: string;
-}) => {
-  const [count, setCount] = useState(0);
-  const [ref, isVisible] = useOnScreen({ threshold: 0.2 });
-
-  useEffect(() => {
-    if (isVisible) {
-      let start = 0;
-      const end = value;
-      // If the value is 0, just set it and return.
-      if (start === end) return;
-
-      // Find duration per integer
-      let duration = 1500 / end;
-      if (end > 1000) duration = 0.5;
-      if (end < 100) duration = 20;
-
-
-      const timer = setInterval(() => {
-        start += 5;
-        if (start > end) start = end; // Prevent overshoot
-        setCount(start);
-        if (start === end) {
-          clearInterval(timer);
-        }
-      }, duration);
-
-      return () => clearInterval(timer);
-    }
-  }, [isVisible, value]);
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "transform transition-all duration-1000 ease-out",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      )}
-    >
-      <Card className="bg-card/50 text-center p-6">
-        <Icon className="mx-auto h-12 w-12 text-primary mb-4" />
-        <p className="text-4xl font-bold text-foreground">
-          {count}
-          {suffix}
-        </p>
-        <p className="text-muted-foreground">{label}</p>
-      </Card>
-    </div>
-  );
-};
-
-// faster
-
 const AnimatedStatistic = ({
   icon: Icon,
   value,
   label,
   suffix = "",
+  increment = 1,
 }: {
   icon: React.ElementType;
   value: number;
   label: string;
   suffix?: string;
+  increment?: number;
 }) => {
   const [count, setCount] = useState(0);
   const [ref, isVisible] = useOnScreen({ threshold: 0.2 });
@@ -126,78 +65,15 @@ const AnimatedStatistic = ({
     if (isVisible) {
       let start = 0;
       const end = value;
-      // If the value is 0, just set it and return.
       if (start === end) return;
 
-      // Find duration per integer
-      let duration = 1500 / end;
-      if (end > 1000) duration = 0.5;
-      if (end < 100) duration = 20;
-
-
-      const timer = setInterval(() => {
-        start += 1;
-        setCount(start);
-        if (start === end) {
-          clearInterval(timer);
-        }
-      }, duration);
-
-      return () => clearInterval(timer);
-    }
-  }, [isVisible, value]);
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "transform transition-all duration-1000 ease-out",
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      )}
-    >
-      <Card className="bg-card/50 text-center p-6">
-        <Icon className="mx-auto h-12 w-12 text-primary mb-4" />
-        <p className="text-4xl font-bold text-foreground">
-          {count}
-          {suffix}
-        </p>
-        <p className="text-muted-foreground">{label}</p>
-      </Card>
-    </div>
-  );
-};
-
-// super faster
-
-const AnimatedStatisticFastFast = ({
-  icon: Icon,
-  value,
-  label,
-  suffix = "",
-}: {
-  icon: React.ElementType;
-  value: number;
-  label: string;
-  suffix?: string;
-}) => {
-  const [count, setCount] = useState(0);
-  const [ref, isVisible] = useOnScreen({ threshold: 0.2 });
-
-  useEffect(() => {
-    if (isVisible) {
-      let start = 0;
-      const end = value;
-      // If the value is 0, just set it and return.
-      if (start === end) return;
-
-      // Find duration per integer
-      let duration = 1500 / end;
-      if (end > 1000) duration = 0.5;
-      if (end < 100) duration = 20;
-
+      // Adjust duration based on value and increment speed
+      let duration = 2000 / (end / increment);
+      if (end > 1000) duration = 0.1;
+      if (end < 100) duration = 25;
 
       const timer = setInterval(() => {
-        start += 10;
+        start += increment;
         if (start > end) start = end; // Prevent overshoot
         setCount(start);
         if (start === end) {
@@ -207,7 +83,7 @@ const AnimatedStatisticFastFast = ({
 
       return () => clearInterval(timer);
     }
-  }, [isVisible, value]);
+  }, [isVisible, value, increment]);
 
   return (
     <div
@@ -217,13 +93,13 @@ const AnimatedStatisticFastFast = ({
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       )}
     >
-      <Card className="bg-card/50 text-center p-6">
+      <Card className="bg-card/50 text-center p-6 h-full">
         <Icon className="mx-auto h-12 w-12 text-primary mb-4" />
         <p className="text-4xl font-bold text-foreground">
-          {count}
+          {count.toLocaleString()}
           {suffix}
         </p>
-        <p className="text-muted-foreground">{label}</p>
+        <p className="text-muted-foreground mt-2">{label}</p>
       </Card>
     </div>
   );
@@ -244,40 +120,57 @@ export default function HomePage() {
   return (
     <div className="dark min-h-screen bg-background text-foreground">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center h-screen p-6 text-center relative">
-        <div
-          ref={mainCardRef}
-          className={cn(
-            "transform transition-all duration-1000 ease-out",
-            isMainCardVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-          )}
-        >
-          <Card className="w-full max-w-3xl bg-card/80 backdrop-blur-xl border-none shadow-2xl">
-            <CardHeader>
-              <CardTitle className="text-5xl font-bold text-primary tracking-tight">
-                scrapp
-              </CardTitle>
-              <p className="text-muted-foreground text-lg">
-                Your Smart Waste Disposal Helper
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <p className="text-xl text-foreground/90">
-                Confused about recycling? Scrapp makes it simple. Just snap a photo, and we'll tell you exactly how to dispose of your items properly. Then, we'll tell you where you can dispose of the item. 
-              </p>
-              <Button asChild size="lg" className="mt-4">
-                <Link href="/">
-                  Get Started <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+      <section className="flex flex-col items-center justify-center h-screen p-6 text-center relative overflow-hidden">
+        {/* Video Background Container */}
+        <div className="absolute top-0 left-0 w-full h-full z-0 video-container">
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+            >
+                <source src="https://www.pexels.com/download/video/9056204/?fps=29.97&h=2160&w=3840" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        
+        {/* Hero Content Wrapper */}
+        <div className="relative z-10 flex flex-col items-center justify-center w-full">
+            <div
+              ref={mainCardRef}
+              className={cn(
+                "transform transition-all duration-1000 ease-out",
+                isMainCardVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              )}
+            >
+              <Card className="w-full max-w-3xl bg-card/80 backdrop-blur-xl border-none shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="text-5xl font-bold text-primary tracking-tight">
+                    scrapp
+                  </CardTitle>
+                  <p className="text-muted-foreground text-lg">
+                    Your Smart Waste Disposal Helper
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <p className="text-xl text-foreground/90">
+                    Confused about recycling? Scrapp makes it simple. Just snap a photo, and we'll tell you exactly how to dispose of your items properly. Then, we'll tell you where you can dispose of the item. 
+                  </p>
+                  <Button asChild size="lg" className="mt-4">
+                    <Link href="/">
+                      Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
         </div>
 
         {/* Scroll Down Arrow */}
         <div
           onClick={handleScrollDown}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 cursor-pointer animate-bob"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 cursor-pointer animate-bob z-30"
         >
           <ArrowDown className="w-8 h-8 text-muted-foreground" />
         </div>
@@ -293,21 +186,24 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <AnimatedStatistic
               icon={Recycle}
-              value={45}
+              value={79}
               suffix="%"
-              label="of global municipal waste fails to reach a facility capable of proper management each year."
+              label="of plastic waste ends up in landfills or nature because it's not recycled."
+              increment={1}
             />
-            <AnimatedStatisticFast
+            <AnimatedStatistic
               icon={Trash2}
-              value={2000}
+              value={220}
               suffix="M"
-              label="tons of municipal solid waste are improperly managed or uncollected each year."
+              label="tons of plastic waste will be generated this year alone."
+              increment={5}
             />
-            <AnimatedStatisticFastFast
+            <AnimatedStatistic
               icon={Globe}
-              value={4500}
-              suffix="B"
-              label="cigarette butts are improperly discarded annually worldwide, making it the most littered item on the planet."
+              value={82}
+              suffix="M"
+              label="tons of e-waste are projected for 2030, a 32% increase from 2022."
+              increment={2}
             />
           </div>
         </div>
@@ -316,7 +212,8 @@ export default function HomePage() {
        {/* Footer */}
       <footer className="py-8 text-center text-muted-foreground text-sm">
         <p>Making waste disposal less confusing, one photo at a time.</p>
-        <p>Data from <a href="https://blogs.worldbank.org/en/sustainablecities/how-the-world-bank-is-tackling-the-growing-global-waste-crisis" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">World Bank</a></p>
+        
+        <p>Data from various 2024 environmental reports.</p>
       </footer>
     </div>
   );
