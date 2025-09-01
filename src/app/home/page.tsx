@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Recycle, Globe, Trash2, ArrowDown } from "lucide-react";
+import { ArrowRight, Recycle, Globe, Trash2, ArrowDown, Camera, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // This is a custom hook to detect if an element is visible on the screen.
@@ -215,9 +215,28 @@ export default function HomePage() {
           <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
             Uploading and classifying your trash is as easy as 1-2-3!
           </p>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
+            <a href="/">
+            <AnimatedStatistic
+              icon={Camera}
+              value={1}
+              label='Press "Get Started" to navigate to the main page, then snap a picture.'
+              increment={1}
+            /></a>
+            <a href="/">
+            <AnimatedStatistic
+              icon={Users}
+              value={2}
+              label="Upload your image to get instant advice and interact with the community."
+              increment={1}
+            /></a>
+            <a href="/locations">
+            <AnimatedStatistic
+              icon={MapPin}
+              value={3}
+              label="Find the disposal location nearest to you."
+              increment={1}
+            /></a>
           </div>
 
         </div>
@@ -226,8 +245,7 @@ export default function HomePage() {
        {/* Footer */}
       <footer className="py-8 text-center text-muted-foreground text-sm">
         <p>Making waste disposal less confusing, one photo at a time.</p>
-        
-        <p>Data from various 2024 environmental reports.</p>
+        <p>Data from the <a href='https://blogs.worldbank.org/en/sustainablecities/how-the-world-bank-is-tackling-the-growing-global-waste-crisis'>The World Bank</a>.</p>
       </footer>
     </div>
   );
