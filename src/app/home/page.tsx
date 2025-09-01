@@ -209,6 +209,20 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="py-20 bg-muted/45">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-4">How it Works</h2>
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
+            Uploading and classifying your trash is as easy as 1-2-3!
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+          </div>
+
+        </div>
+      </section>
+
        {/* Footer */}
       <footer className="py-8 text-center text-muted-foreground text-sm">
         <p>Making waste disposal less confusing, one photo at a time.</p>
