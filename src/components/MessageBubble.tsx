@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface MessageBubbleProps {
   message?: string;
@@ -17,8 +18,8 @@ export function MessageBubble({
   timestamp,
   onImageClick
 }: MessageBubbleProps) {
-  const hasText = !!(message && message.length > 0)
-  const hasImage = !!image
+  const hasText = !!(message && message.length > 0);
+  const hasImage = !!image;
 
   return (
     <div
@@ -30,7 +31,7 @@ export function MessageBubble({
         className={cn(
           "max-w-[80%] rounded-2xl px-4 py-3 shadow-sm",
           isUser
-            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+            ? "bg-gradient-to-r from-green-700 to-green-900 text-white"
             : "bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-900 dark:text-gray-100"
         )}>
         {hasImage && (
@@ -45,7 +46,14 @@ export function MessageBubble({
           />
         )}
         {hasText && (
-          <p className="text-sm whitespace-pre-wrap">{message}</p>
+          <p className="text-sm whitespace-pre-wrap mb-3">{message}</p>
+        )}
+        {!isUser && (
+          <Link href={"/locations"}>
+            <p className="text-blue-300 underline">
+              Want to find a place to dispose?
+            </p>
+          </Link>
         )}
         {timestamp && (
           <p
