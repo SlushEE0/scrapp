@@ -1,7 +1,7 @@
 // Make this a client component to allow for user interaction and state changes.
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,6 @@ import {
   Compass,
   Phone
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 // Define a type for our location data for better type-checking.
 type Location = {
@@ -172,6 +171,10 @@ export default function LocationsPage() {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    handleSearch();
+  }, [activeCategory]);
+
   // Filter the mock locations based on the active category.
   const filteredLocations = mockLocations.filter(
     (loc) => loc.category === activeCategory
@@ -221,7 +224,7 @@ export default function LocationsPage() {
 
           {/* List of Locations */}
 
-          <div className="space-y-4 pr-4">
+          <div className="space-y-4">
             {filteredLocations.map((location, index) => (
               <Card
                 key={index}

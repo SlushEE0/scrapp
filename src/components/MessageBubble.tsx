@@ -51,7 +51,7 @@ export function MessageBubble({
         {!isUser && (
           <Link href={"/locations"}>
             <p className="text-blue-300 underline">
-              Want to find a place to dispose?
+              Find disposal locations near you!
             </p>
           </Link>
         )}
