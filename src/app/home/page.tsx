@@ -23,7 +23,7 @@ const useOnScreen = (options: IntersectionObserverInit) => {
         setIsVisible(true);
         // We can unobserve after it becomes visible to prevent re-triggering.
         if (ref.current) {
-            observer.unobserve(ref.current);
+          observer.unobserve(ref.current);
         }
       }
     }, options);
@@ -123,48 +123,48 @@ export default function HomePage() {
       <section className="flex flex-col items-center justify-center h-screen p-6 text-center relative overflow-hidden">
         {/* Video Background Container */}
         <div className="absolute top-0 left-0 w-full h-full z-0 video-container">
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-            >
-                <source src="https://www.pexels.com/download/video/9056204/?fps=29.97&h=2160&w=3840" type="video/mp4" />
-                Your browser does not support the video tag.
-            </video>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="https://www.pexels.com/download/video/9056204/?fps=29.97&h=2160&w=3840" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
-        
+
         {/* Hero Content Wrapper */}
         <div className="relative z-10 flex flex-col items-center justify-center w-full">
-            <div
-              ref={mainCardRef}
-              className={cn(
-                "transform transition-all duration-1000 ease-out",
-                isMainCardVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
-              )}
-            >
-              <Card className="w-full max-w-3xl bg-card/80 backdrop-blur-xl border-none shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-5xl font-bold text-primary tracking-tight">
-                    scrapp
-                  </CardTitle>
-                  <p className="text-muted-foreground text-lg">
-                    Your Smart Waste Disposal Helper
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <p className="text-xl text-foreground/90">
-                    Confused about recycling? Scrapp makes it simple. Just snap a photo, and we'll tell you exactly how to dispose of your items properly. Then, we'll tell you where you can dispose of the item. 
-                  </p>
-                  <Button asChild size="lg" className="mt-4">
-                    <Link href="/">
-                      Get Started <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+          <div
+            ref={mainCardRef}
+            className={cn(
+              "transform transition-all duration-1000 ease-out",
+              isMainCardVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+            )}
+          >
+            <Card className="w-full max-w-3xl bg-card/80 backdrop-blur-xl border-none shadow-2xl">
+              <CardHeader>
+                <CardTitle className="text-5xl font-bold text-primary tracking-tight">
+                  scrapp
+                </CardTitle>
+                <p className="text-muted-foreground text-lg">
+                  Your Smart Waste Disposal Helper
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <p className="text-xl text-foreground/90">
+                  Confused about recycling? Scrapp makes it simple. Just snap a photo, and we'll tell you exactly how to dispose of your items properly. Then, we'll tell you where you can dispose of the item.
+                </p>
+                <Button asChild size="lg" className="mt-4">
+                  <Link href="/">
+                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Scroll Down Arrow */}
@@ -211,38 +211,184 @@ export default function HomePage() {
 
       <section className="py-20 bg-muted/45">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-4">How it Works</h2>
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
-            Uploading and classifying your trash is as easy as 1-2-3!
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <a href="/">
-            <AnimatedStatistic
-              icon={Camera}
-              value={1}
-              label='Press "Get Started" to navigate to the main page, then snap a picture.'
-              increment={1}
-            /></a>
-            <a href="/">
-            <AnimatedStatistic
-              icon={Users}
-              value={2}
-              label="Upload your image to get instant advice and interact with the community."
-              increment={1}
-            /></a>
-            <a href="/locations">
-            <AnimatedStatistic
-              icon={MapPin}
-              value={3}
-              label="Find the disposal location nearest to you."
-              increment={1}
-            /></a>
-          </div>
+          {/*Convert JSON data to a  Adhere to styling in the previous div, and follow UI best practices and good strategies to create sections for each of the six records. The UI should look very appealing and look quite good to users.*/}
+          {/* 3x2 Educational Cards – hardcoded data + UI */}
+          {(() => {
+            type Item = {
+              item_name: string;
+              category: "Curbside Recyclable" | "Curbside Recyclable + Organics" | "Store Drop-Off" | "Scrap/Buy-Back" | "Household Hazardous Waste";
+              misconception_summary: string;
+              the_truth: string;
+              prep_steps: string[];
+              exceptions: string;
+              where_to_take: string;
+              impact_note: string;
+              citation_url: string;
+              last_verified: string;
+              short_user_tip: string;
+            };
+
+            const items: Item[] = [
+              {
+                "item_name": "Empty aerosol cans (non-hazardous contents)",
+                "category": "Curbside Recyclable",
+                "misconception_summary": "People often toss aerosol cans in the trash or avoid recycling them altogether.",
+                "the_truth": "In San Diego County, EMPTY aerosol cans are accepted in curbside recycling as metal; non-empty or hazardous-product cans are HHW.",
+                "prep_steps": ["Use up contents completely until no spray or hiss", "Do NOT puncture", "Place loose in blue bin (not bagged)"],
+                "exceptions": "If any liquid/pressure remains or the product is hazardous (e.g., paint/solvent), treat as Household Hazardous Waste (HHW).",
+                "where_to_take": "If not empty or hazardous: City of San Diego HHW Transfer Facility (appointment required)",
+                "impact_note": "Recycling metal saves significant energy and reduces the need for virgin ore.",
+                "citation_url": "https://www.sandiegocounty.gov/content/sdc/dpw/recycling/RecycleRight.html",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "If it’s truly empty, recycle it with metals; if not, book HHW."
+              },
+              {
+                "item_name": "Plastic film & bags (grocery, bread, bubble wrap)",
+                "category": "Store Drop-Off",
+                "misconception_summary": "Many residents put film plastic in the blue bin, where it tangles sorting machinery.",
+                "the_truth": "Not accepted curbside in San Diego—take clean/dry film plastic to participating retail store drop-off locations.",
+                "prep_steps": ["Remove receipts/labels", "Ensure clean and dry", "Stuff smaller bags into one bag (bag-your-bags)"],
+                "exceptions": "Do NOT place film plastic in the blue bin; contaminated film is trash.",
+                "where_to_take": "Participating retailers listed via WasteFreeSD or PlasticFilmRecycling.org",
+                "impact_note": "Keeping film out of curbside prevents MRF jams and improves recycling quality.",
+                "citation_url": "https://www.sandiegocounty.gov/content/sdc/dpw/recycling/Plastic.html",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "Never in blue bin—bring clean, dry bags to store drop-off."
+              },
+              {
+                "item_name": "Pizza boxes (clean lid vs. greasy bottom)",
+                "category": "Curbside Recyclable + Organics",
+                "misconception_summary": "People think all pizza boxes are trash because of grease.",
+                "the_truth": "Recycle the clean cardboard portion; food-soiled paper belongs in your green organics bin.",
+                "prep_steps": ["Tear off clean lid for blue bin", "Put greasy bottom in green organics", "Remove liners/food"],
+                "exceptions": "Heavily contaminated boxes with plastic liners or excess residue—remove contaminants before sorting.",
+                "where_to_take": "Curbside (blue for clean cardboard; green for food-soiled paper)",
+                "impact_note": "Diverts cardboard to recycling and food-soiled paper to compost, reducing landfill methane.",
+                "citation_url": "https://www.sandiegocounty.gov/content/sdc/sustainability/news/Recycling101.html",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "Clean lid = blue; greasy bottom = green."
+              },
+              {
+                "item_name": "Rigid plastic plant pots, buckets & toys",
+                "category": "Curbside Recyclable",
+                "misconception_summary": "Residents often trash bulky rigid plastics like pots and buckets.",
+                "the_truth": "The City accepts rigid plastics—including clean pots, buckets, trays and toys—in curbside recycling.",
+                "prep_steps": ["Empty soil/debris", "Quickly rinse if needed", "Place items empty, dry, and loose in blue bin"],
+                "exceptions": "Foam (Styrofoam) pots or flexible film plastics are not accepted curbside.",
+                "where_to_take": "Curbside blue bin",
+                "impact_note": "Recycling rigid plastics reduces landfill volume and supports recycled resin markets.",
+                "citation_url": "https://www.sandiego.gov/environmental-services/recycling/ro",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "Rigid, empty & dry plastic pots and buckets go in blue."
+              },
+              {
+                "item_name": "Scrap metal & metal clothing hangers",
+                "category": "Scrap/Buy-Back",
+                "misconception_summary": "Many try to toss hangers/scrap metal in the blue bin or trash them.",
+                "the_truth": "Scrap metal is NOT accepted in curbside recycling; take to a scrap recycler or find locations via WasteFreeSD.",
+                "prep_steps": ["Remove non-metal parts", "Bundle small pieces safely", "Transport to local recycler"],
+                "exceptions": "Do not place in blue bin—can damage sorting equipment.",
+                "where_to_take": "Scrap metal recycler; search WasteFreeSD.org for locations",
+                "impact_note": "Recycling metal recovers high-value material and prevents equipment jams at MRFs.",
+                "citation_url": "https://www.sandiegocounty.gov/content/sdc/dpw/recycling/RecycleRight.html",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "Not blue-bin—take metal hangers/scrap to a recycler (see WasteFreeSD)."
+              },
+              {
+                "item_name": "Household batteries (AA/AAA, button, lithium-ion)",
+                "category": "Household Hazardous Waste",
+                "misconception_summary": "People still put batteries in trash or blue bins.",
+                "the_truth": "Universal wastes like batteries are illegal in the trash; City residents must use the HHW Transfer Facility or other approved options.",
+                "prep_steps": ["Store in a safe container", "Tape terminals (especially lithium/button types)", "Make HHW appointment"],
+                "exceptions": "Do not place in any curbside bin; damaged/leaking batteries require extra caution and isolation.",
+                "where_to_take": "City of San Diego HHW Transfer Facility (Miramar) by appointment",
+                "impact_note": "Proper handling prevents fires in collection trucks and facilities and avoids toxic releases.",
+                "citation_url": "https://www.sandiego.gov/environmental-services/ep/hazardous/battrecycle",
+                "last_verified": "2025-09-13",
+                "short_user_tip": "Never curbside—tape terminals and book HHW."
+              }
+            ];
+
+            const categoryPill = (category: Item["category"]) => {
+              const base = "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset";
+              const look =
+                category === "Curbside Recyclable" ? "bg-emerald-500/15 text-emerald-400 ring-emerald-500/30" :
+                  category === "Curbside Recyclable + Organics" ? "bg-lime-500/15 text-lime-400 ring-lime-500/30" :
+                    category === "Store Drop-Off" ? "bg-sky-500/15 text-sky-400 ring-sky-500/30" :
+                      category === "Scrap/Buy-Back" ? "bg-amber-500/15 text-amber-400 ring-amber-500/30" :
+                        "bg-rose-500/15 text-rose-400 ring-rose-500/30";
+              return <span className={`${base} ${look}`}>{category}</span>;
+            };
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {items.map((it, idx) => (
+                  <Card
+                    key={idx}
+                    className="group relative overflow-hidden border-none bg-card/70 backdrop-blur-xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                  >
+                    {/* soft gradient halo */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-70" />
+                    <CardHeader className="relative">
+                      <div className="flex items-start justify-between gap-4">
+                        <CardTitle className="text-xl font-semibold leading-tight">{it.item_name}</CardTitle>
+                        {categoryPill(it.category)}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">{it.misconception_summary}</p>
+                    </CardHeader>
+                    <CardContent className="relative space-y-4">
+                      {/* <div className="rounded-lg border border-border/50 bg-background/60 p-3">
+                        <p className="text-sm"><span className="font-medium">The truth:</span> {it.the_truth}</p>
+                      </div> */}
+
+                      <div>
+                        <p className="text-sm font-medium">Prep steps</p>
+                        <ul className="mt-2 list-disc pl-5 space-y-1 text-sm text-foreground/90">
+                          {it.prep_steps.map((s, i) => <li key={i}>{s}</li>)}
+                        </ul>
+                      </div>
+
+                      <div className="text-sm">
+                        <p><span className="font-medium">Exceptions:</span> {it.exceptions}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="h-4 w-4 opacity-70" />
+                        <span><span className="font-medium">Where to take:</span> {it.where_to_take}</span>
+                      </div>
+
+                      <div className="rounded-md bg-muted/40 p-3 text-sm flex items-start gap-2">
+                        <Globe className="h-4 w-4 mt-0.5 opacity-70" />
+                        <div>
+                          <p className="">{it.impact_note}</p>
+                          <a
+                            href={it.citation_url}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="text-primary underline underline-offset-4 hover:no-underline"
+                            aria-label="Official guidance link"
+                          >
+                            Official guidance
+                          </a>
+                          <p className="text-xs text-muted-foreground mt-1">Verified {it.last_verified}</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-1">
+                        <p className="text-sm font-medium">Quick tip</p>
+                        <p className="text-sm text-muted-foreground">{it.short_user_tip}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            );
+          })()}
 
         </div>
       </section>
 
-       {/* Footer */}
+      {/* Footer */}
       <footer className="py-8 text-center text-muted-foreground text-sm">
         <p>Making waste disposal less confusing, one photo at a time.</p>
         <p>Data from the <a href='https://blogs.worldbank.org/en/sustainablecities/how-the-world-bank-is-tackling-the-growing-global-waste-crisis'>The World Bank</a>.</p>
