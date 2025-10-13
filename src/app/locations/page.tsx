@@ -1,4 +1,3 @@
-// Make this a client component to allow for user interaction and state changes.
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -13,17 +12,16 @@ import {
   Recycle,
   Search,
   Compass,
-  Phone
+  Phone,
+  Heart
 } from "lucide-react";
 
-// Define a type for our location data for better type-checking.
 type Location = {
   name: string;
   address: string;
-  category: "e_waste" | "compost" | "recycle";
+  category: "e_waste" | "compost" | "recycle" | "donation";
 };
 
-// UPDATED: Mock data now reflects real locations in San Diego County.
 const mockLocations: Location[] = [
   // E-Waste Locations
   {
@@ -134,20 +132,46 @@ const mockLocations: Location[] = [
     name: "New Roots Community Farm",
     address: "5326 Chollas Pkwy, San Diego, CA 92105",
     category: "compost"
+  },
+
+  // Donation Centers
+  {
+    name: "Goodwill Industries of San Diego County",
+    address: "3663 Rosecrans St, San Diego, CA 92110",
+    category: "donation"
+  },
+  {
+    name: "Salvation Army Thrift Store",
+    address: "3350 Sports Arena Blvd, San Diego, CA 92110",
+    category: "donation"
+  },
+  {
+    name: "Father Joe’s Villages Donation Center",
+    address: "815 33rd St, San Diego, CA 92102",
+    category: "donation"
+  },
+  {
+    name: "AMVETS Thrift Store",
+    address: "3441 Sutherland St, San Diego, CA 92110",
+    category: "donation"
+  },
+  {
+    name: "Disabled American Veterans Thrift Store",
+    address: "7061 Clairemont Mesa Blvd, San Diego, CA 92111",
+    category: "donation"
   }
 ];
 
-// A mapping of category IDs to their display names and icons.
 const categories = {
   e_waste: { label: "E-Waste", icon: Battery },
   compost: { label: "Compost", icon: Leaf },
-  recycle: { label: "Recycling", icon: Recycle }
+  recycle: { label: "Recycling", icon: Recycle },
+  donation: { label: "Donation", icon: Heart }
 };
 
 export default function LocationsPage() {
-  // State to manage the active category, search query, loading state, and map URL.
   const [activeCategory, setActiveCategory] = useState<
-    "e_waste" | "compost" | "recycle"
+    "e_waste" | "compost" | "recycle" | "donation"
   >("recycle");
   const [searchQuery, setSearchQuery] = useState("San Diego, CA");
   const [mapUrl, setMapUrl] = useState(
@@ -155,18 +179,13 @@ export default function LocationsPage() {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  // Function to handle the search.
   const handleSearch = () => {
     if (!searchQuery) return;
     setIsLoading(true);
-
     const categoryLabel = categories[activeCategory].label;
-    // Construct the new Google Maps URL based on the category and search query.
     const newUrl = `https://www.google.com/maps?q=${encodeURIComponent(
-      `${categoryLabel} near ${searchQuery}`
+      `${categoryLabel} centers near ${searchQuery}`
     )}&output=embed`;
-
-    // Simulate a network delay for a better user experience.
     setMapUrl(newUrl);
     setIsLoading(false);
   };
@@ -175,63 +194,62 @@ export default function LocationsPage() {
     handleSearch();
   }, [activeCategory]);
 
-  // Filter the mock locations based on the active category.
   const filteredLocations = mockLocations.filter(
     (loc) => loc.category === activeCategory
   );
 
   return (
     <div className="dark max-h-screen bg-background flex flex-col lg:flex-row p-4 lg:p-6 gap-6">
-      {/* --- Sidebar for Controls and Location List --- */}
+      {/* Sidebar */}
       <Card className="w-full lg:w-1/3 lg:max-w-md flex flex-col border-border shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="text-primary" />
-            Find Disposal Centers
+            Find Disposal & Donation Centers
           </CardTitle>
         </CardHeader>
+
         <CardContent className="flex-grow flex flex-col gap-6 overflow-scroll">
-          {/* Search Input and Button */}
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter city or zip code..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <Button onClick={handleSearch} disabled={isLoading}>
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+          {/* Search Input */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter city or zip code..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <Button onClick={handleSearch} disabled={isLoading}>
+              <Search className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Category Filter Buttons */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* Tabs for categories */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {Object.entries(categories).map(([key, { label, icon: Icon }]) => (
               <Button
                 key={key}
                 variant={activeCategory === key ? "default" : "outline"}
                 onClick={() =>
-                  setActiveCategory(key as "e_waste" | "compost" | "recycle")
+                  setActiveCategory(
+                    key as "e_waste" | "compost" | "recycle" | "donation"
+                  )
                 }
-                className="flex items-center gap-2">
+                className="flex items-center gap-2"
+              >
                 <Icon className="h-4 w-4" />
                 {label}
               </Button>
             ))}
           </div>
 
-          {/* List of Locations */}
-
+          {/* Locations List */}
           <div className="space-y-4">
             {filteredLocations.map((location, index) => (
               <Card
                 key={index}
-                className="p-4 bg-muted/50 hover:bg-muted/80 transition-colors">
-                <h3 className="font-semibold text-foreground">
-                  {location.name}
-                </h3>
+                className="p-4 bg-muted/50 hover:bg-muted/80 transition-colors"
+              >
+                <h3 className="font-semibold text-foreground">{location.name}</h3>
                 <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                   <Compass className="h-4 w-4" /> {location.address}
                 </p>
@@ -244,7 +262,7 @@ export default function LocationsPage() {
         </CardContent>
       </Card>
 
-      {/* --- Main Content Area for the Map --- */}
+      {/* Map Display */}
       <div className="flex-grow rounded-lg overflow-hidden relative shadow-lg">
         {isLoading && (
           <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10">
@@ -257,7 +275,8 @@ export default function LocationsPage() {
           style={{ border: 0 }}
           loading="lazy"
           allowFullScreen
-          src={mapUrl}></iframe>
+          src={mapUrl}
+        ></iframe>
       </div>
     </div>
   );
