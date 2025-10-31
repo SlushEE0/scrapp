@@ -24,17 +24,6 @@ more complicated recycling guides just quick, clear help when you need it.
 - Mobile-friendly: Works great on phones and computers
 - Clean design: Simple, easy-to-use interface
 
-## What's Coming Next
-
-- AI-Powered Recognition: Analyze captured images to identify waste items
-- Disposal Recommendations: Provide specific disposal instructions based
-  on item type and location
-- Location-Based Services: Find nearby recycling centers and disposal
-  facilities
-- Impact Tracking: Monitor environmental impact and disposal habits
-- Gamification: Achievement system to encourage proper waste disposal
-- Progressive Web App: Offline functionality and app-like experience
-
 ## Tech Stuff
 
 Frontend (this repo): Next.js, React, TypeScript, Tailwind CSS  
