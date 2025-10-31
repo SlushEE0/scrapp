@@ -1,4 +1,4 @@
-# ♻️ Scrapp - Smart Waste Disposal Helper
+Scrapp - Smart Waste Disposal Helper
 
 _Congressional App Challenge 2025 Submission_
 
@@ -16,29 +16,29 @@ throw things away. This leads to recyclables ending up in landfills, hazardous
 items in regular trash, and a lot of confusion at the recycling bin.
 
 We wanted to make it simple: take a picture, get an answer. No more guessing, no
-more complicated recycling guides - just quick, clear help when you need it.
+more complicated recycling guides just quick, clear help when you need it.
 
 ## What We've Built So Far
 
-- 📸 **Camera that works**: Point, shoot, and capture photos with your phone
-- 📱 **Mobile-friendly**: Works great on phones and computers
-- � **Clean design**: Simple, easy-to-use interface
+- Camera that works: Point, shoot, and capture photos with your phone
+- Mobile-friendly: Works great on phones and computers
+- Clean design: Simple, easy-to-use interface
 
 ## What's Coming Next
 
-- 🤖 **AI-Powered Recognition**: Analyze captured images to identify waste items
-- 🗂️ **Disposal Recommendations**: Provide specific disposal instructions based
+- AI-Powered Recognition: Analyze captured images to identify waste items
+- Disposal Recommendations: Provide specific disposal instructions based
   on item type and location
-- 📍 **Location-Based Services**: Find nearby recycling centers and disposal
+- Location-Based Services: Find nearby recycling centers and disposal
   facilities
-- 📊 **Impact Tracking**: Monitor environmental impact and disposal habits
-- 🏆 **Gamification**: Achievement system to encourage proper waste disposal
-- 📱 **Progressive Web App**: Offline functionality and app-like experience
+- Impact Tracking: Monitor environmental impact and disposal habits
+- Gamification: Achievement system to encourage proper waste disposal
+- Progressive Web App: Offline functionality and app-like experience
 
 ## Tech Stuff
 
-**Frontend (this repo)**: Next.js, React, TypeScript, Tailwind CSS **Backend**:
-[Check out our backend here](https://github.com/adikatre/Congressional-App-Challenge-Backend)
+Frontend (this repo): Next.js, React, TypeScript, Tailwind CSS  
+Backend: [Check out our backend here](https://github.com/adikatre/scrapp-backend)
 
 ## Congressional App Challenge
 
@@ -46,26 +46,17 @@ We're high school students participating in the Congressional App
 Challenge 2025. The challenge asks students to create apps that help their
 communities, and we chose to tackle the confusion around proper waste disposal.
 
-**The Problem**: People don't know how to dispose of things properly, which
+The Problem: People don't know how to dispose of things properly, which
 hurts the environment.
 
-**Our Solution**: Scrapp makes it simple - just take a photo and get clear
+Our Solution: Scrapp makes it simple - just take a photo and get clear
 disposal instructions.
 
-## What's Next
+## Made by:
 
-- [ ] Connect the AI brain (image recognition)
-- [ ] Show disposal recommendations
-- [ ] Find nearby recycling centers
-- [ ] Track your environmental impact
-- [ ] Add fun achievements for good disposal habits
-- [ ] Make it work offline too
-
-## The Team
-
-- **Frontend**: [SlushEE0](https://github.com/adikatre) (that's me!)
-- **Backend & AI**: [adikatre](https://github.com/adikatre)
+- Frontend: [SlushEE0](https://github.com/adikatre)
+- Backend & AI: [adikatre](https://github.com/slushee0)
 
 ---
 
-_Making waste disposal less confusing, one photo at a time._ 📱♻️
+_Making waste disposal less confusing, one photo at a time._
