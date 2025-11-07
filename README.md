@@ -1,5 +1,10 @@
 Scrapp - Smart Waste Disposal Helper
 
+### Quickstart
+
+Start Next.js local server: `bun run dev`
+ - Predictions won't work until the [backend](https://github.com/adikatre/scrapp-backend) is running.
+
 ## What is Scrapp?
 
 Ever wondered if that weird plastic container can be recycled? Or where to throw
