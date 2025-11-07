@@ -1,7 +1,5 @@
 Scrapp - Smart Waste Disposal Helper
 
-_Congressional App Challenge 2025 Submission_
-
 ## What is Scrapp?
 
 Ever wondered if that weird plastic container can be recycled? Or where to throw
